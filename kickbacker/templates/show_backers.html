@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Backers for Project {{ project.name }}</h1>
+{{ project.desc }}
+
+<br>
+{% if backer_list %}
+  {% for backer in backer_list %}
+    {% set backer = backer_list[backer] %}
+    {% include 'backer.html' with context %}
+  {% endfor %}
+{% else %}
+
+No Backers found for {{ project_id }}
+
+{% endif %}
+
+{% endblock content %}

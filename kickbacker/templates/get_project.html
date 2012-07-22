@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block header %}
+ <script type='text/javascript' src='/static/kickbacker.js'></script>
+{% endblock header %}
+
+{% block content %}
+<form class="well">
+
+  {% if project_url %}
+
+  {% else %}
+    <div class="control-group">
+      <label class="control-label">Kickstarter Project: </label>
+      <div class="controls">
+        <input id="ks-url" name="url" type="text" size="40">
+      </div>
+    </div>
+  {% endif %}
+  <div class="control-group">
+    <label class="control-label">Kickstarter Profile: </label>
+    <div class="controls">
+      <input id="ks-profile" name="ks-profile" type="text" size="40">
+    </div>
+  </div>
+  <button type="button" onclick='display_url()' class="btn btn-primary">Create Your Link!</button>
+</form>
+
+{{project}}
+<div id='your-link'>
+Your Link Here
+</div>
+
+{% endblock content %}

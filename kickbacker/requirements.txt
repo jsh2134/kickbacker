@@ -1,0 +1,3 @@
+flask
+redis
+BeautifulSoup=3.2

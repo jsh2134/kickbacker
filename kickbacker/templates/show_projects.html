@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Projects </h1>
+
+<br>
+{% if projects %}
+  {{ projects}}
+  {% for project in projects %}
+    {% set project = projects[project] %}
+    {% include 'project.html' with context %}
+  {% endfor %}
+{% else %}
+
+No Projects Found
+
+{% endif %}
+
+{% endblock content %}
