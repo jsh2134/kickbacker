@@ -6,7 +6,8 @@ import redis
 
 class KickFlask(Flask):
 
-	def set_logging(self):
+	def setup_logging(self):
+		# Set logging
 		log_filename = self.config['LOGFILE']
 		file_handler = RotatingFileHandler(log_filename)
 		file_handler.setLevel(logging.INFO)

@@ -4,9 +4,11 @@ import re
 import time
 import logging
 
+logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
+
 import BeautifulSoup
 
-from kickbacker import lib
+from kickbacker import datalib
 
 def get_kickstarter_response(url, json_out=True):
 	logging.info("Hitting %s" % url)
@@ -83,6 +85,10 @@ def parse_project(js):
 						projects[project['id']]['end'] = li.attrs[1][1]
 	return projects
 
+def strip_url_args(url):
+	if url.find('?'):
+		url = url[:url.find('?')]
+	return url
 
 def parse_backer_projects(projects_list, projects_dict):
 	""" Parse a list of projects and find their respective
@@ -91,9 +97,7 @@ def parse_backer_projects(projects_list, projects_dict):
 	for project in projects_list:
 		name = project.div.h2.a.contents[0]
 		url = find_attr(u'href', project.div.a.attrs)
-		# Strip away any ref args
-		if url.find('?'):
-			url = url[:url.find('?')]
+		url = strip_url_args(url)
 
 		pid = get_project_id(url)
 
@@ -109,6 +113,7 @@ def parse_backers(backer_list, backer_dict):
 	for backer in backer_list:
 		img = find_attr(u'src', backer.a.img.attrs)
 		url = find_attr(u'href', backer.a.attrs)
+		url = strip_url_args(url)
 		key = get_backer_id(url)
 		name = backer.div.a.contents[0]
 		note_res = backer.findAll('div', {'class': 'note'})
@@ -137,7 +142,7 @@ def get_projects(rs, search_key):
 
 	for project in project_map:
 		for key, value in project_map[project].iteritems():
-			a = lib.update_project(rs, project, key, value)
+			a = datalib.update_project(rs, project, key, value)
 			logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 	
 	return project_map
@@ -145,43 +150,50 @@ def get_projects(rs, search_key):
 
 def get_backers(rs, url):
 
+	url = strip_url_args(url)
 	logging.info( "Getting backers for %s" % (url) )
 
 	backer_url = "%s/backers?page=%s"
 	backer_tag = 'NS-backers-backing-row'
 	backer_index = 1
-	max_backers = 200
+	max_backers = 100
 	backer_dict = {}
 
 	project_id = get_project_id(url)
+	datalib.add_project(rs, project_id)
 
 	while True:
 		
-		backer_html = get_kickstarter_response(backer_url % (url, backer_index) , json_out = False)
+		backer_html = get_kickstarter_response(backer_url % \
+								(url, backer_index) , json_out = False)
 		soup = BeautifulSoup.BeautifulSoup(backer_html)
 		backers = soup.findAll("div", {'class': backer_tag})
 		if not backers:
 			logging.info("Found no backers on page %s" % (backer_index))
 			break
 		else:
-			logging.info("Found %s backers on page %s" % (len(backers), backer_index) )
+			logging.info("Found %s backers on page %s" % \
+								(len(backers), backer_index) )
 			parse_backers(backers, backer_dict)
 			backer_index+=1
-			
-			if backer_index > max_backers:
-				logging.info('hit %s backers, breaking out of loop' % max_backers)
+
+			if len(backer_dict) >= max_backers:
+				logging.info('hit %s backers, breaking out of loop' % \
+														max_backers)
 				break 
 
 			# Sleep for two seconds
-			time.sleep(2)
+			logging.info('%s backers found' % len(backer_dict))
+			time.sleep(1)
 	
 	for backer_id in backer_dict:
-		success = lib.add_project_backer(rs, project_id, backer_id)
+		backer_success = datalib.add_backer(rs, backer_id)
+		success = datalib.add_project_backer(rs, project_id, backer_id)
 		for key, val in backer_dict[backer_id].iteritems():
-			a = lib.update_backer(backer_id, key, val )
+			a = datalib.update_backer(rs, backer_id, key, val )
 			logging.info('%s %s: %s' % ("Added" if a else "Existed", key, val))
 
-	return backer_dict
+	return project_id, backer_dict
 
 def get_backer_projects(rs, url):
 
@@ -208,12 +220,18 @@ def get_backer_projects(rs, url):
 			logging.info("Found %s projects on page %s" % (len(projects), projects_index) )
 			parse_backer_projects(projects, projects_dict)
 			projects_index+=1
-			if projects_index > max_projects:
+			if len(projects_dict) >= max_projects:
 				logging.info("Reached %s projects, exiting" % max_projects)
 				break
 
+			logging.info('%s projects found' % len(projects_dict))
 			# Sleep for two seconds
-			time.sleep(2)
-	#TODO insert into redis
+			time.sleep(1)
+
+	for project_id in projects_dict:
+		datalib.add_project(rs, project_id)
+		for key, value in projects_dict[project_id].iteritems():
+			datalib.update_project(rs, project_id, key, value)
+
 	return projects_dict
 
