@@ -1,0 +1,20 @@
+
+.project_wrap {
+	display:table;
+}
+.project {
+	display:table-cell;
+}
+
+.project_keys {
+	display:table-cell;
+}
+
+.project_key_referrers {
+	display:table-cell;
+}
+
+.project_backers {
+	display:table-cell;
+}
+

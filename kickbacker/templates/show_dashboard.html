@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block header %}
+ <script type='text/javascript'>
+ function toggle_div(divid) {
+    $(divid).toggle();
+ }
+ </script>
+{% endblock%}
+
+{% block content %}
+
+<h2>{{ total_clicks }} Total Clicks</h2>
+{% for project in projects %}
+
+<div class='project-wrap'>
+  <div id='project-{{project}}' class='project'>
+    <a href="http://kickstarter.com/{{projects[project].link}}">{{ projects[project].name }}</a> by <a href="http://kickstarter.com/{{projects[project].author_link}}">{{projects[project].author}}</a>
+    <br>
+    <img src='{{projects[project].img}}' width='200' style='margin:10px;'>
+    </div>
+    <div id='project-keys-{{project}}' class='project_keys'>
+    {{ projects[project]['clicks'] }} Total Project Clicks
+      <ul id='keys'>
+      {% for key_id in projects[project]['key_set'] %}
+      {% set key = projects[project]['keys'][key_id] %}
+        <li>
+          <a href="http://demo.awe.sm/{{ key_id }}">http://demo.awe.sm/{{ key_id }}</a> clicked {{ key['clicks'] }} times since {{ key['created'].strftime('%m/%d') }}
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+
+    <div id='key-referrers-{{project}}' class='project_key_referrers'>
+      Referrals
+      <ul id='key_referrers'>
+      {% for key_id in projects[project]['key_set'] %}
+        {% for ref in projects[project]['keys'][key_id]['referrers'] %}
+        {% set key = projects[project]['keys'][key_id] %}
+          <li>
+              {% if ref!='None' %}
+                <a href='{{ref}}'>{{ ref }}</a>
+               {% else %}
+                 Unknown / Direct
+               {% endif %}
+          </li>
+        {% endfor %}
+      {% endfor %}
+      </ul>
+    </div>
+ 
+    <div id='project_backers-{{project}}' class='project_backers'>
+    <a href="javascript:toggle_div('#project-backers-ul-{{project}}')">Toggle Backers</a>
+      <ul id='project-backers-ul-{{project}}' style='display:none;'>
+      {% for backer in projects[project]['backers'] %}
+        <li>
+          {{ backer }}
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+{% endfor %}
+
+{% endblock content %}
+
