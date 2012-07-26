@@ -8,7 +8,12 @@ logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
 
 import BeautifulSoup
 
+from kickbacker import app
 from kickbacker import datalib
+
+KS_ROOT = 'http://www.kickstarter.com'
+BACKER_URL = KS_ROOT + '/profile/%s'
+
 
 def get_kickstarter_response(url, json_out=True):
 	logging.info("Hitting %s" % url)
@@ -18,6 +23,12 @@ def get_kickstarter_response(url, json_out=True):
 		return json.loads(resp)
 	else:
 		return resp
+
+
+def strip_url_args(url):
+	if url.find('?'):
+		url = url[:url.find('?')]
+	return url
 
 
 def find_attr(attr_name, attr_list):
@@ -31,10 +42,15 @@ def find_attr(attr_name, attr_list):
 	return None
 
 
-def get_backer_id(url):
-	""" URL is in the form /profile/<id or name>/ 
+def get_backer_id(url, full_url=True):
+	""" URL is in the form /profile/<id or name>/ unless full_url is pasesed
 		For now we will assume this is unique """
-	return url.replace('/profile/', '')
+	if full_url:
+		id_match = re.compile('.*\/profile\/(\w+)\/?.*')
+		find_bid = id_match.match(url)
+		return find_bid.groups()[0]
+	else:
+		return url.replace('/profile/', '')
 
 
 def get_project_id(url):
@@ -48,8 +64,127 @@ def get_project_id(url):
 
 	return pid
 
+#############################
+# Parsers
+#############################
 
-def parse_project(js):
+def parse_backer_page(backer_id, soup):
+	""" Parse a single backer page identified by its URL
+	
+	**Arguments**
+		:backer_id: id of the backer
+		:soup: BeautifulSoup'd response object
+
+	**Returns**
+		A dictionary of backer attributes
+	"""
+
+	backer = { 'id': backer_id,
+			   'url': BACKER_URL % (backer_id)
+			}
+
+	img_div= soup.findAll("div", {"id":"profile-avatar"})
+	backer['img'] = find_attr('src', img_div[0].img.attrs)
+
+	name_div= soup.findAll("div", {"id":"profile-bio"})
+	backer['name'] = name_div[0].h2.contents[0].replace('\n','').strip()
+
+	loc_div= soup.findAll("div", {"class":"location"})
+	backer['location'] = loc_div[0].contents[1].strip()
+
+	bio_div= soup.findAll("div", {"class":"bio"})
+	backer['bio'] = bio_div[0].p.contents[0].strip()
+
+	return backer
+
+
+def parse_project_page(project_id, soup):
+	""" Parse a single project page identified by its URL
+	
+	**Arguments**
+		:project_id: id of the project
+		:soup: BeautifulSoup'd response object
+
+	**Returns**
+		A dictionary of project attributes
+	"""
+
+	project = { 'id': project_id }
+
+	name_h1 = soup.findAll('h1', {'id':'title'})[0]
+	project['name'] = name_h1.a.contents[0]
+	project['title'] = name_h1.a.contents[0]
+	project['link'] = find_attr('href', name_h1.a.attrs)
+	author_a = soup.findAll('a', {'data-modal-title':'Biography'})[0]
+	project['author_link'] = find_attr('href', author_a.attrs)
+	project['author'] = author_a.contents[0]
+	desc_p = soup.findAll('p', {'class':'short-blurb'})[0].contents[0]
+	project['desc'] = desc_p
+	desc_p_long = soup.findAll('div', {'class':'full-description'})[0].p.contents[0]
+	project['desc'] = desc_p_long
+	project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].replace('\n','')
+	project['end'] = soup.findAll('li', {'class':'ends'})[0].contents[2].replace('\n','')
+
+	video_notifier_div = soup.findAll('div', {'data-has-video': 'false'})
+	if video_notifier_div:
+			project['img'] = \
+							find_attr('src', video_notifier_div[0].img.attrs)
+	else:
+		video_div = soup.findAll('div', {'class':'video-player'})
+		if video_div:
+			project['img'] = \
+							find_attr('data-image', video_div[0].attrs)
+			project['video'] = \
+							find_attr('data-video', video_div[0].attrs)
+
+	number_divs = soup.findAll('div', {'class':'num'})
+	for nd in number_divs:
+		if find_attr('data-backers-count', nd.attrs):
+			project['backers_count'] = \
+						find_attr('data-backers-count', nd.attrs)
+		if find_attr('data-goal', nd.attrs):
+			project['goal'] = \
+						find_attr('data-goal', nd.attrs)
+		if find_attr('data-percent-raised', nd.attrs):
+			project['pct-funded'] = \
+						find_attr('data-percent-raised', nd.attrs)
+
+		if 'pct-funded' in project:
+			if float(project['pct-funded']) < 1.0:
+				project['status'] = "Raising"
+				project['funded'] = False
+			else:
+				project['status'] = "Funded"
+				project['funded'] = True
+
+		if find_attr('data-pledged', nd.attrs):
+			project['amount'] = \
+						find_attr('data-pledged', nd.attrs)
+
+	number_divs = soup.findAll('span', {'id':'project_duration_data'})
+	for nd in number_divs:
+		if find_attr('data-end_time', nd.attrs):
+			project['end_time'] = \
+						find_attr('data-end_time', nd.attrs)
+		if find_attr('data-hours_remaining', nd.attrs):
+			project['hours_left'] = \
+						find_attr('data-hours_remaining', nd.attrs)
+
+	loc_div = soup.findAll('li', {'class':'location'})[0]
+	project['loc'] = loc_div.a.contents[1].strip()
+
+	return project
+
+
+def parse_project_results_json(js):
+	""" Parse a group of projects returned via JSON call
+	
+	**Arguments**
+		:js: JSON response object
+
+	**Returns**
+		A dictionary projects and their attributes
+	"""
 	projects = {}
 	for project in js['projects']:
 		projects[project['id']] = {	
@@ -85,10 +220,6 @@ def parse_project(js):
 						projects[project['id']]['end'] = li.attrs[1][1]
 	return projects
 
-def strip_url_args(url):
-	if url.find('?'):
-		url = url[:url.find('?')]
-	return url
 
 def parse_backer_projects(projects_list, projects_dict):
 	""" Parse a list of projects and find their respective
@@ -107,7 +238,7 @@ def parse_backer_projects(projects_list, projects_dict):
 
 
 def parse_backers(backer_list, backer_dict):
-	""" Parse a list of backers and find their respective
+	""" Given a Project URL, parse a list of backers and find their respective
 		attributes
 	"""
 	for backer in backer_list:
@@ -131,24 +262,57 @@ def parse_backers(backer_list, backer_dict):
 		logging.info(backer_dict[key])
 
 
-def get_projects(rs, search_key):
+def get_project(project_url):
+
+	logging.info("Parsing URL %s" % (project_url) )
+
+	resp = get_kickstarter_response(project_url, json_out=False)
+	soup = BeautifulSoup.BeautifulSoup(resp)
+
+	project_id = get_project_id(project_url)
+	project_dict = parse_project_page(project_id, soup)
+	for key, value in project_dict.iteritems():
+		a = datalib.update_project(app.rs, project_id, key, value)
+		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
+	
+	return project_dict
+
+
+def get_backer(backer_url):
+
+	logging.info("Parsing URL %s" % (backer_url) )
+
+	resp = get_kickstarter_response(backer_url, json_out=False)
+	soup = BeautifulSoup.BeautifulSoup(resp)
+
+	backer_id = get_backer_id(backer_url, full_url=True)
+
+	backer_dict = parse_backer_page(backer_id, soup)
+	for key, value in backer_dict.iteritems():
+		a = datalib.update_backer(app.rs, backer_id, key, value)
+		logging.info('%s %s: %s for %s' % ("Added" if a else "Existed", key, value, backer_id))
+	
+	return backer_dict
+
+
+def get_projects(search_key):
 	base_url = "http://www.kickstarter.com/%s/search.json?utf8=&term=%s"
 
 	url = base_url % ('projects', search_key)
 	logging.info("Searching with URL %s" % (url) )
 
 	js = get_kickstarter_response(url)
-	project_map = parse_project(js)
+	project_map = parse_project_results_json(js)
 
 	for project in project_map:
 		for key, value in project_map[project].iteritems():
-			a = datalib.update_project(rs, project, key, value)
+			a = datalib.update_project(app.rs, project, key, value)
 			logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 	
 	return project_map
 
 
-def get_backers(rs, url):
+def get_backers(url):
 
 	url = strip_url_args(url)
 	logging.info( "Getting backers for %s" % (url) )
@@ -160,7 +324,7 @@ def get_backers(rs, url):
 	backer_dict = {}
 
 	project_id = get_project_id(url)
-	datalib.add_project(rs, project_id)
+	datalib.add_project(app.rs, project_id)
 
 	while True:
 		
@@ -187,15 +351,15 @@ def get_backers(rs, url):
 			time.sleep(1)
 	
 	for backer_id in backer_dict:
-		backer_success = datalib.add_backer(rs, backer_id)
-		success = datalib.add_project_backer(rs, project_id, backer_id)
+		backer_success = datalib.add_backer(app.rs, backer_id)
+		success = datalib.add_project_backer(app.rs, project_id, backer_id)
 		for key, val in backer_dict[backer_id].iteritems():
-			a = datalib.update_backer(rs, backer_id, key, val )
+			a = datalib.update_backer(app.rs, backer_id, key, val )
 			logging.info('%s %s: %s' % ("Added" if a else "Existed", key, val))
 
 	return project_id, backer_dict
 
-def get_backer_projects(rs, url):
+def get_backer_projects(url):
 
 	logging.info( "Getting projects for user %s" % (url) )
 	
@@ -229,9 +393,9 @@ def get_backer_projects(rs, url):
 			time.sleep(1)
 
 	for project_id in projects_dict:
-		datalib.add_project(rs, project_id)
+		datalib.add_project(app.rs, project_id)
 		for key, value in projects_dict[project_id].iteritems():
-			datalib.update_project(rs, project_id, key, value)
+			datalib.update_project(app.rs, project_id, key, value)
 
 	return projects_dict
 
