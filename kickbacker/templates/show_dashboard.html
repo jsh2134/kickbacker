@@ -15,7 +15,11 @@
 
 <div class='project-wrap'>
   <div id='project-{{project}}' class='project'>
-    <a href="http://kickstarter.com/{{projects[project].link}}">{{ projects[project].name }}</a> by <a href="http://kickstarter.com/{{projects[project].author_link}}">{{projects[project].author}}</a>
+    <a href="http://kickstarter.com/{{projects[project].link}}">{{ projects[project].name }}</a> 
+    <br>
+    by <a href="http://kickstarter.com/{{projects[project].author_link}}">{{projects[project].author}}</a>
+    <br>
+    <a href="/{{ project }}/leaderboard">Leaderboard</a>
     <br>
     <img src='{{projects[project].img}}' width='200' style='margin:10px;'>
     </div>

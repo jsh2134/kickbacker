@@ -5,10 +5,16 @@ from flask import render_template
 from flask import request
 from flask import jsonify
 from flask import redirect
+from flask import make_response
 
 from kickbacker import app
 from kickbacker import datalib
 from kickbacker import kickstarter
+from kickbacker.celery import tasks
+
+def make_timestamp(time_str, time_format="%Y-%m-%d %H:%M:%S.%f"):
+	return datetime.datetime.strptime(time_str, time_format)
+
 
 def respond_index(project=None):
 	return render_template('get_project.html', project=project)
@@ -47,13 +53,29 @@ def get_project_backers():
 		return jsonify({'id':project_id, 'backers':project_backers})
 
 def key_redirect(project_id, backer_id):
+	""" Lookups proper redirect, logs clicks, sets cookie """
 	raw_key = request.values.get('awesm')
 	key = raw_key.split('_')[1]
-	app.logger.info("%s %s" % (raw_key, key))
 	redirect_url = datalib.get_redirect(app.rs, key)
 	app.logger.info("Redirecting to %s" % (redirect_url) )
-	# TODO set some cookies with the project and backer ids
-	return redirect(redirect_url)
+
+	# Increment Clicks
+	datalib.increment_short_key_value(app.rs, key, 'clicks')
+	datalib.increment_backer_value(app.rs, backer_id, 'clicks')
+	datalib.increment_project_value(app.rs, project_id, 'clicks')
+
+	# Store Referral URL (for now)
+	datalib.add_short_key_referrer(app.rs, key, request.referrer)
+
+	# Set Redirect URL
+	resp = make_response( redirect(redirect_url) )
+
+	# Set cookie with the project and backer ids
+	resp.set_cookie('kb_%s_%s' % (backer_id, project_id),
+					'%s:%s' % (backer_id, project_id),
+					max_age=231000000)
+
+	return resp
 
 
 def add_short_key():
@@ -63,11 +85,24 @@ def add_short_key():
 	backer_id = request.form.get('backer_id')
 	project_id = request.form.get('project_id')
 
-	# TODO queue up backer scrape job
-	datalib.add_backer(app.rs, backer_id)
-	# TODO queue up project scrape job
-	datalib.add_project(app.rs, project_id)
+	create_new_project(backer_id, project_id, key, kb_url, url)
 
+	return jsonify( {   'success':True, 
+						'message':'Added key:%s for backer:%s to project:%s' \
+									% (key, backer_id, project_id)})
+
+
+def create_new_project(backer_id, project_id, key, kb_url, url):
+
+	# Queue up backer scrape job
+	datalib.add_backer(app.rs, backer_id)
+	tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id))
+
+	# Queue up project scrape job
+	datalib.add_project(app.rs, project_id)
+	tasks.harvest_project.delay(url)
+
+	datalib.add_project_backer(app.rs, project_id, backer_id)
 	datalib.add_short_key(app.rs, key)
 	datalib.add_backer_short_key(app.rs, backer_id, key)
 	datalib.add_project_short_key(app.rs, project_id, key)
@@ -78,8 +113,62 @@ def add_short_key():
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
 	datalib.update_short_key(app.rs, key, 'backer_id', backer_id)
 
-	return jsonify( {   'success':True, 
-						'message':'Added key:%s for backer:%s to project:%s' \
-									% (key, backer_id, project_id)})
 
+def dashboard():
+	""" Display stats about all projects"""	
+	project_dict={}
+	projects = datalib.get_projects(app.rs)
+	total_clicks = 0
+	for project_id in projects:
+		project_dict[project_id] = datalib.get_project(app.rs, project_id)
 
+		if 'clicks' in project_dict[project_id]:
+			total_clicks += int(project_dict[project_id]['clicks'])
+
+		project_dict[project_id]['backers'] = \
+					datalib.get_project_backers(app.rs, project_id)
+		project_dict[project_id]['key_set'] = \
+					datalib.get_project_short_keys(app.rs, project_id)
+
+		project_dict[project_id]['keys'] = {}
+		for key in project_dict[project_id]['key_set']:
+			project_dict[project_id]['keys'][key] = \
+								datalib.get_short_key(app.rs, key)
+
+			# Format Timestamp
+			project_dict[project_id]['keys'][key]['created'] = \
+							make_timestamp(project_dict[project_id]['keys'][key]['created'])
+
+			project_dict[project_id]['keys'][key]['referrers'] = \
+							datalib.get_short_key_referrer_list(app.rs, key)
+		
+	return render_template('show_dashboard.html',
+								projects = project_dict,
+								total_clicks = total_clicks)
+
+def leaderboard(project_id):
+	""" Display project stats """
+	project = datalib.get_project(app.rs, project_id)
+	project_backers = datalib.get_project_backers(app.rs, project_id)
+	project_keys = datalib.get_project_short_keys(app.rs, project_id)
+
+	total_clicks = 0
+	backer_dict = {}
+	for backer_id in project_backers:
+		backer_dict[backer_id] = datalib.get_backer(app.rs, backer_id)
+		backer_key_list = datalib.get_backer_short_keys(app.rs, backer_id)
+		for key_id in backer_key_list:
+			if key_id in project_keys:
+				backer_dict[backer_id]['key'] = datalib.get_short_key(app.rs, key_id)
+
+				# Aggregate Clicks
+				total_clicks += int(backer_dict[backer_id]['key']['clicks'])
+				
+				# Format Timestamp
+				backer_dict[backer_id]['key']['created'] = \
+									make_timestamp(backer_dict[backer_id]['key']['created'])
+
+	return render_template('show_leaderboard.html',
+								project = project,
+								backers = backer_dict,
+								total_clicks = total_clicks)

@@ -6,8 +6,6 @@ from kickbacker import kickstarter
 
 def main():
 	
-	rs = app.rs
-
 	try:
 		key = sys.argv[1]
 		if key == 'search_projects':
@@ -28,7 +26,7 @@ def main():
 			"""
 		sys.exit(1)
 
-	dispatch(rs, url)
+	dispatch(url)
 	print "Done with %s" % key
 
 if __name__ == '__main__':

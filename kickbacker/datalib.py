@@ -21,6 +21,10 @@ def update_project(rs, project_id, key, value):
 	""" Add Metadata to a project """
 	return rs.hset("project:%s" % project_id, key, value)
 
+def increment_project_value(rs, project_id, value, inc=1):
+	"""Increment project value by inc"""
+	return rs.hincrby('project:%s' % project_id, value, inc)
+
 def add_project_backer(rs, project_id, backer_id):
 	""" Add a backer to a project"""
 	return rs.sadd('project:%s:backers' % (project_id), backer_id)
@@ -59,6 +63,10 @@ def get_backer(rs, backer_id):
 	""" Get Backer Metadata """
 	return rs.hgetall('backer:%s' % (backer_id))
 
+def increment_backer_value(rs, backer_id, value, inc=1):
+	"""Increment backer value by inc"""
+	return rs.hincrby('backer:%s' % backer_id, value, inc)
+
 # Backer object - backer:keys:<id>
 def add_backer_short_key(rs, backer_id, key):
 	""" Add Backer Key """
@@ -90,6 +98,19 @@ def update_short_key(rs, key_id, key, val):
 def get_short_key(rs, key_id):
 	""" Return Key Metadata """
 	return rs.hgetall('key:%s' % key_id)
+
+def increment_short_key_value(rs, key_id, value, inc=1):
+	"""Increment key value by inc"""
+	return rs.hincrby('key:%s' % key_id, value, inc)
+
+def add_short_key_referrer(rs, key_id, referrer):
+	""" Log referrer of a key """
+	return rs.rpush('key:%s:referrer' % key_id, referrer)
+
+def get_short_key_referrer_list(rs, key_id):
+	""" Log referrer of a key """
+	print "key:%s:referrer" % key_id
+	return rs.lrange('key:%s:referrer' % key_id, 0, -1)
 
 # Key Redirect - key:<id>:redirect
 def add_redirect(rs, key, url):

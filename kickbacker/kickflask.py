@@ -10,8 +10,18 @@ class KickFlask(Flask):
 		# Set logging
 		log_filename = self.config['LOGFILE']
 		file_handler = RotatingFileHandler(log_filename)
-		file_handler.setLevel(logging.INFO)
+
+		if self.config['DEBUG']:
+			file_handler.setLevel(logging.INFO)
+		else:
+			file_handler.setLevel(logging.ERROR)
+
+		kb_fmt = u'[%(asctime)s %(levelname)s] - %(processName)s (%(process)s) - (%(module)s:%(funcName)s:%(lineno)s) %(message)s'
+		kb_formatter = logging.Formatter(fmt=kb_fmt)
+		file_handler.setFormatter(kb_formatter)
+
 		self.logger.addHandler(file_handler)
+		
 
 	def connect_redis(self):
 		try:

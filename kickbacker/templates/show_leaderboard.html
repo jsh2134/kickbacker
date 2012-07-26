@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block header %}
+ <script type='text/javascript'>
+ function toggle_div(divid) {
+    $(divid).toggle();
+ }
+ </script>
+{% endblock%}
+
+{% block content %}
+
+  <div id='project-{{project}}' class='project'>
+    <img src='{{project.img}}' width='200' style='margin:10px;'>
+    
+    <h1><a href="http://kickstarter.com/{{project.link}}">{{ project.name }}</a></h1>
+    <h2>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></h2>
+    <h2>{{ total_clicks }} Total Clicks</h2>
+  </div>
+
+{% for backer in backers %}
+
+<div class='backer-wrap'>
+  <div id='backer-{{backer}}' class='backer well'>
+    <img src='{{backers[backer].img}}' width='100' style='margin:10px;float:left;'>
+    <h2><a href="http://kickstarter.com/profile/{{ backer }}">{{ backers[backer].name }}</a></h2>
+    <div id='backer-keys-{{backer}}' class='key_info'>
+      {% set key = backers[backer]['key'] %}
+      <h1> <a href="http://demo.awe.sm/{{ key['id'] }}">http://demo.awe.sm/{{ key['id'] }}</a>
+          <br>
+          Clicks {{ key['clicks'] }}
+          <br>Since {{ key['created'].strftime('%m/%d') }}
+      </h1>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock content %}
+

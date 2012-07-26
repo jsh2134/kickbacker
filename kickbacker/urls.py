@@ -30,4 +30,11 @@ def respond_add_key():
 def respond_redirect(project_id, backer_id):
 	return views.key_redirect(project_id, backer_id)
 
+@app.route('/admin/dashboard')
+def respond_dashboard():
+	return views.dashboard()
+
+@app.route('/<project_id>/leaderboard')
+def respond_leaderboard(project_id):
+	return views.leaderboard(project_id)
 
