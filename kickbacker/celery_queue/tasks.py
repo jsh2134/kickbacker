@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from kickbacker import kickstarter
-from kickbacker.celery.celery_queue import celery
+from kickbacker.celery_queue.celery_queue import celery
 
 
 @celery.task

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="hero-unit">
+<h1>Oops!</h1>
+<h2>
+{% if nf_type == 'project' %}
+  The project "{{nf_id}}" was not found or may have been deleted.
+{% elif nf_type == 'backer' %}
+  The backer "{{nf_id}}" was not found or may have been deleted.
+{% else %}
+  {{nf_type}} {{nf_id}} not found.
+{% endif %}
+</h2>
+</div>
+
+{% endblock%}
+

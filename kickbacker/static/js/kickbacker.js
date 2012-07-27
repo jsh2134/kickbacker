@@ -74,19 +74,35 @@ function get_project_id(url) {
   return matched[1]
 }
 
-function get_kb_url(project_id, backer_id) {
+function build_kb_url(project_id, backer_id) {
   return self.document.location.origin + "/" 
             + "r/"
             + project_id + "/"
             + backer_id + "/"
   }
 
+function clean_url(url) {
+  var pattern = '([^?]*)';
+  var matched = url.match(pattern);
+  return matched[1]
+}
+
+function is_valid_kickstarter_url(url) {
+  if (url.match('kickstarter') != null) { return true; }
+  else { return false;}
+}
+
 function display_url() {
     var url = $('#ks-url').val();
     var profile = $('#ks-profile').val();
+
+    //Strip Args from URLs
+    url = clean_url(url);
+    profile = clean_url(profile);
+
     var backer_id = get_backer_id(profile);
     var project_id = get_project_id(url);
-    var kb_url = get_kb_url(project_id, backer_id);
+    var kb_url = build_kb_url(project_id, backer_id);
     get_awesm_url(kb_url, function(data) {
                 $('#your-link').html(data.awesm_url);
                 save_key(data.path, backer_id, project_id, url, kb_url);

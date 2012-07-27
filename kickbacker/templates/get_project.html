@@ -2,33 +2,66 @@
 
 {% block header %}
  <script type='text/javascript' src='/static/js/kickbacker.js'></script>
+
+ <script type='text/javascript'>
+$(function () {
+  $('#ks-url').keyup(function() {
+    url = $('#ks-url').val();
+    if (is_valid_kickstarter_url(url) == false) {
+       $('#ks-url').addClass('error');
+       $('#go').attr('disabled', 'disabled');
+    } else {
+       $('#ks-url').removeClass('error');
+        if (is_valid_kickstarter_url($('#ks-profile').val()) == true) {
+          $('#go').removeAttr('disabled');
+        }
+    }
+  });
+  $('#ks-profile').keyup(function() {
+    url = $('#ks-profile').val();
+    if (is_valid_kickstarter_url(url) == false) {
+       $('#ks-profile').addClass('error');
+       $('#go').attr('disabled', 'disabled');
+    } else {
+       $('#ks-profile').removeClass('error');
+        if (is_valid_kickstarter_url($('#ks-url').val()) == true) {
+          $('#go').removeAttr('disabled');
+        }
+    }
+  });
+});
+</script>
+
 {% endblock header %}
 
 {% block content %}
-<form class="well">
-
-  {% if project_url %}
-
-  {% else %}
+<form class="form-vertical well" >
+  <fieldset class="control-group">
+    {% if project %}
+          <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+    {% else %}
+      <div class="control-group">
+        <label class="control-label">Kickstarter Project: </label>
+        <div class="controls">
+          <input id="ks-url" name="url" type="text" class='input-xlarge' value='http://www.kickstarter.com/projects/307436684/three-and-a-half-pike?ref=users'>
+        </div>
+      </div>
+    {% endif %}
     <div class="control-group">
-      <label class="control-label">Kickstarter Project: </label>
+      <label class="control-label">Kickstarter Profile: </label>
       <div class="controls">
-        <input id="ks-url" name="url" type="text" size="40" value='http://www.kickstarter.com/projects/307436684/three-and-a-half-pike?ref=users'>
+        <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' value="http://www.kickstarter.com/profile/jeffhull">
       </div>
     </div>
-  {% endif %}
-  <div class="control-group">
-    <label class="control-label">Kickstarter Profile: </label>
-    <div class="controls">
-      <input id="ks-profile" name="ks-profile" type="text" size="40" value="http://www.kickstarter.com/profile/jeffhull">
-    </div>
+    <button id='go' type="button" onclick='display_url()' class="btn btn-primary">Create Your Link!</button>
+
+  <div id='your-link'>
+    <textarea class='input-large' style='margin-top:15px; font-size:1.6em;'>
+      Your Kickbacker Link Here
+    </textarea>
   </div>
-  <button type="button" onclick='display_url()' class="btn btn-primary">Create Your Link!</button>
+</fieldset>
 </form>
 
-{{project}}
-<div id='your-link'>
-Your Link Here
-</div>
 
 {% endblock content %}

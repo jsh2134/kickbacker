@@ -18,3 +18,51 @@
 	display:table-cell;
 }
 
+.project-title {
+	font-size:2em;
+}
+.project-author {
+	font-size:1.7em;
+}
+.project-clicks {
+	font-size:1.3em;
+}
+
+
+.project-leaderboard {
+	margin:20px;
+}
+
+.backer {
+	display:table;
+}
+.backer-rank {
+	display:table-cell;
+	width:75px;
+	font-size:4em;
+	margin:20px;
+	vertical-align:middle;
+}
+.backer-info {
+	display:table-cell;
+	width:300px;
+	vertical-align:middle;
+}
+.backer-stats {
+	display:table-cell;
+	width:200px;
+	margin:20px;
+	vertical-align:middle;
+}
+.backer-badges {
+	display:table-cell;
+	width:200px;
+	margin:20px;
+	vertical-align:middle;
+}
+
+img.thumb {
+	margin:5px 10px;
+	float:left;
+}
+

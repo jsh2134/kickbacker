@@ -10,6 +10,7 @@ import BeautifulSoup
 
 from kickbacker import app
 from kickbacker import datalib
+from kickbacker import lib
 
 KS_ROOT = 'http://www.kickstarter.com'
 BACKER_URL = KS_ROOT + '/profile/%s'
@@ -25,44 +26,18 @@ def get_kickstarter_response(url, json_out=True):
 		return resp
 
 
-def strip_url_args(url):
-	if url.find('?'):
-		url = url[:url.find('?')]
-	return url
-
-
 def find_attr(attr_name, attr_list):
 	""" Given a list of attribute tuples, return the value
 		of the attribute attr_name or None if not found
 	"""
-	logging.info("Looking for <%s> in %s" % (attr_name, attr_list))
 	for attr in attr_list:
 		if attr[0] == attr_name:
 			return attr[1]
+	logging.debug("Attr Lookup - could not find <%s> in %s" % \
+							(attr_name, attr_list))
 	return None
 
 
-def get_backer_id(url, full_url=True):
-	""" URL is in the form /profile/<id or name>/ unless full_url is pasesed
-		For now we will assume this is unique """
-	if full_url:
-		id_match = re.compile('.*\/profile\/(\w+)\/?.*')
-		find_bid = id_match.match(url)
-		return find_bid.groups()[0]
-	else:
-		return url.replace('/profile/', '')
-
-
-def get_project_id(url):
-	id_match = re.compile('.*\/projects\/(\w+)\/.*')
-	find_pid = id_match.match(url)
-	if find_pid:
-		pid = find_pid.groups()[0]
-	else:
-		logging.info('could not find a pid in %s' % (url))
-		pid = url
-
-	return pid
 
 #############################
 # Parsers
@@ -115,27 +90,79 @@ def parse_project_page(project_id, soup):
 	project['name'] = name_h1.a.contents[0]
 	project['title'] = name_h1.a.contents[0]
 	project['link'] = find_attr('href', name_h1.a.attrs)
-	author_a = soup.findAll('a', {'data-modal-title':'Biography'})[0]
-	project['author_link'] = find_attr('href', author_a.attrs)
-	project['author'] = author_a.contents[0]
-	desc_p = soup.findAll('p', {'class':'short-blurb'})[0].contents[0]
-	project['desc'] = desc_p
-	desc_p_long = soup.findAll('div', {'class':'full-description'})[0].p.contents[0]
-	project['desc'] = desc_p_long
-	project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].replace('\n','')
-	project['end'] = soup.findAll('li', {'class':'ends'})[0].contents[2].replace('\n','')
 
-	video_notifier_div = soup.findAll('div', {'data-has-video': 'false'})
-	if video_notifier_div:
-			project['img'] = \
-							find_attr('src', video_notifier_div[0].img.attrs)
+	author_a = soup.findAll('div', {'id':'creator-name'})
+	if author_a:
+		try:
+			project['author'] = author_a[0].h3.a.contents[0]
+		except:
+			logging.exception("Could not find project 'author' attr")
+			project['author'] = ''
+
+		try:
+			project['author_link'] = \
+						find_attr('href', author_a[0].h3.a.attrs)
+		except:
+			logging.exception("Could not find project 'author_link' attr")
+			project['author_link'] = ''
 	else:
-		video_div = soup.findAll('div', {'class':'video-player'})
-		if video_div:
-			project['img'] = \
-							find_attr('data-image', video_div[0].attrs)
-			project['video'] = \
-							find_attr('data-video', video_div[0].attrs)
+		project['author'] = ''
+		logging.exception("Could not find project 'author' attr")
+	
+
+	try:
+		desc_p = soup.findAll('p', \
+					 {'class':'short-blurb'})[0].contents[0]
+	except Exception:
+		desc_p = ''
+		logging.exception("Could not find project 'desc' attr")
+
+	project['desc'] = desc_p
+
+	try:
+		desc_p_long = soup.findAll('div',\
+					 {'class':'full-description'})[0].p.contents[0]
+	except Exception:
+		desc_p_long = ''
+		logging.exception("Could not find project 'desc_full' attr")
+	project['desc_full'] = desc_p_long
+
+	try:
+		project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].replace('\n','')
+	except:
+		project['started'] = ''
+		logging.exception("Could not find project 'started' attr")
+
+	try:
+		project['end'] = soup.findAll('li', \
+					{'class':'ends'})[0].contents[2].replace('\n','')
+	except:
+		project['end'] = ''
+		logging.exception("Could not find project 'end' attr")
+
+	try:
+		video_notifier_div = soup.findAll('div', {'data-has-video': 'false'})
+		if video_notifier_div:
+				project['img'] = \
+					find_attr('src', video_notifier_div[0].img.attrs)
+		else:
+			video_div = soup.findAll('div', {'class':'video-player'})
+			if video_div:
+				project['img'] = \
+						find_attr('data-image', video_div[0].attrs)
+				project['video'] = \
+						find_attr('data-video', video_div[0].attrs)
+	except:
+		project['img'] = ''
+		logging.exception("Could not find project 'img' attr")
+
+	try:
+		loc_div = soup.findAll('li', {'class':'location'})[0]
+		project['loc'] = loc_div.a.contents[1].strip()
+	except:
+		project['loc'] = ''
+		logging.exception("Could not find project 'loc' attr")
+
 
 	number_divs = soup.findAll('div', {'class':'num'})
 	for nd in number_divs:
@@ -169,9 +196,6 @@ def parse_project_page(project_id, soup):
 		if find_attr('data-hours_remaining', nd.attrs):
 			project['hours_left'] = \
 						find_attr('data-hours_remaining', nd.attrs)
-
-	loc_div = soup.findAll('li', {'class':'location'})[0]
-	project['loc'] = loc_div.a.contents[1].strip()
 
 	return project
 
@@ -228,7 +252,7 @@ def parse_backer_projects(projects_list, projects_dict):
 	for project in projects_list:
 		name = project.div.h2.a.contents[0]
 		url = find_attr(u'href', project.div.a.attrs)
-		url = strip_url_args(url)
+		url = lib.strip_url_args(url)
 
 		pid = get_project_id(url)
 
@@ -244,7 +268,7 @@ def parse_backers(backer_list, backer_dict):
 	for backer in backer_list:
 		img = find_attr(u'src', backer.a.img.attrs)
 		url = find_attr(u'href', backer.a.attrs)
-		url = strip_url_args(url)
+		url = lib.strip_url_args(url)
 		key = get_backer_id(url)
 		name = backer.div.a.contents[0]
 		note_res = backer.findAll('div', {'class': 'note'})
@@ -314,7 +338,7 @@ def get_projects(search_key):
 
 def get_backers(url):
 
-	url = strip_url_args(url)
+	url = lib.strip_url_args(url)
 	logging.info( "Getting backers for %s" % (url) )
 
 	backer_url = "%s/backers?page=%s"

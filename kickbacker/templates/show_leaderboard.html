@@ -10,31 +10,60 @@
 
 {% block content %}
 
-  <div id='project-{{project}}' class='project'>
-    <img src='{{project.img}}' width='200' style='margin:10px;'>
-    
-    <h1><a href="http://kickstarter.com/{{project.link}}">{{ project.name }}</a></h1>
-    <h2>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></h2>
-    <h2>{{ total_clicks }} Total Clicks</h2>
-  </div>
+<input type=hidden value="{{project}}">
 
-{% for backer in backers %}
-
-<div class='backer-wrap'>
-  <div id='backer-{{backer}}' class='backer well'>
-    <img src='{{backers[backer].img}}' width='100' style='margin:10px;float:left;'>
-    <h2><a href="http://kickstarter.com/profile/{{ backer }}">{{ backers[backer].name }}</a></h2>
-    <div id='backer-keys-{{backer}}' class='key_info'>
-      {% set key = backers[backer]['key'] %}
-      <h1> <a href="http://demo.awe.sm/{{ key['id'] }}">http://demo.awe.sm/{{ key['id'] }}</a>
-          <br>
-          Clicks {{ key['clicks'] }}
-          <br>Since {{ key['created'].strftime('%m/%d') }}
-      </h1>
-    </div>
-  </div>
+<div id='project-{{project.id}}' class='project-leaderboard'>
+    <div class="thumbnail" style='height:120px;'>
+      <a href="http://kickstarter.com/{{project.link}}">
+        <img src='{{project.img}}' width='150px' class='thumb'>
+      </a>
+      <h1>Kickbacker Leaderboard</h1>
+      <div class="caption">
+        <a href="http://kickstarter.com/{{project.link}}">
+          <span class='project-title'>{{ project.name }}</span>
+        </a>
+        <p>
+          <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+          <br><br>
+          <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
+          &nbsp;&nbsp;
+          <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
+        </p>
+      </div>
 </div>
-{% endfor %}
+
+<div class="backers-container" style='margin:10px;'>
+  {% for backer in sorted_backers %}
+    <div class='backer-wrap well'>
+      <div id='backer-{{backer}}' class='backer'>
+        <div class="backer-rank">
+          {{ loop.index }}.
+        </div>
+        <div class="backer-info">
+          <img src='{{backers[backer].img}}' width='75' class="thumb">
+          <h2>
+            <a href="http://kickstarter.com/profile/{{ backer }}">
+              {{ backers[backer].name }}
+            </a>
+          </h2>
+          <i class="icon-globe"></i> {{ backers[backer].location }}
+          <br>
+          <i class="icon-user"></i> Since {{ backers[backer]['key']['created'].strftime('%B %d') }}
+        </div>
+        <div class="backer-stats">
+         <h1>
+             {{ backers[backer]['key']['clicks'] }} Clicks
+         </h1>
+        </div>
+        <div class="backer-badges">
+         <h1>
+             {{ backers[backer]['key']['badges'] }} Rewards
+         </h1>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
 
 {% endblock content %}
 

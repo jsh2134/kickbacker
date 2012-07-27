@@ -1,6 +1,7 @@
 from kickbacker import app
 from kickbacker import views
 
+@app.route('/')
 @app.route('/new/')
 @app.route('/new/<project>')
 def respond_index(project=None):
