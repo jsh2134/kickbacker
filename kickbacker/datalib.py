@@ -119,3 +119,13 @@ def add_redirect(rs, key, url):
 def get_redirect(rs, key):
 	return rs.get('key:%s:redirect' % key)
 
+# Key Rewards - key:<id>:reward
+def add_rewards(rs, key, reward):
+	return rs.hset('key:%s:rewards' % key, reward, 1)
+
+def incr_rewards(rs, key, reward, inc=1):
+	return rs.hincrby('key:%s:rewards' % key, reward, inc)
+
+def get_rewards(rs, key):
+	return rs.hgetall('key:%s:rewards' % key)
+

@@ -104,7 +104,7 @@ function display_url() {
     var project_id = get_project_id(url);
     var kb_url = build_kb_url(project_id, backer_id);
     get_awesm_url(kb_url, function(data) {
-                $('#your-link').html(data.awesm_url);
+                $('#your-link-area').val(data.awesm_url);
                 save_key(data.path, backer_id, project_id, url, kb_url);
               }, function(data) {
                   console.log(data);

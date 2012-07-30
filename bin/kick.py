@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 
-from kickbacker import app
 from kickbacker import kickstarter
 
 def main():

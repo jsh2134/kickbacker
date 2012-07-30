@@ -10,6 +10,7 @@ from flask import make_response
 from kickbacker import app
 from kickbacker import lib
 from kickbacker import datalib
+from kickbacker import rewards
 from kickbacker import kickstarter
 from kickbacker.celery_queue import tasks
 
@@ -59,7 +60,6 @@ def key_redirect(project_id, backer_id):
 	raw_key = request.values.get('awesm')
 	key = raw_key.split('_')[1]
 	redirect_url = datalib.get_redirect(app.rs, key)
-	app.logger.info("Redirecting to %s" % (redirect_url) )
 
 	# Increment Clicks
 	datalib.increment_short_key_value(app.rs, key, 'clicks')
@@ -68,6 +68,7 @@ def key_redirect(project_id, backer_id):
 
 	# Store Referral URL (for now)
 	datalib.add_short_key_referrer(app.rs, key, request.referrer)
+	rewards.check_for_rewards(key, request.referrer)
 
 	# Set Redirect URL
 	resp = make_response( redirect(redirect_url) )
@@ -99,12 +100,12 @@ def add_short_key():
 def create_new_project(backer_id, project_id, key, kb_url, url):
 
 	# Queue up backer scrape job
-	datalib.add_backer(app.rs, backer_id)
-	tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id))
+	if datalib.add_backer(app.rs, backer_id):
+		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id))
 
 	# Queue up project scrape job
-	datalib.add_project(app.rs, project_id)
-	tasks.harvest_project.delay(url)
+	if datalib.add_project(app.rs, project_id):
+		tasks.harvest_project.delay(url)
 
 	datalib.add_project_backer(app.rs, project_id, backer_id)
 	datalib.add_short_key(app.rs, key)
@@ -170,8 +171,8 @@ def leaderboard(project_id):
 			for key_id in backer_key_list:
 				if key_id in project_keys:
 					backer_dict[backer_id]['key'] = datalib.get_short_key(app.rs, key_id)
-					backer_dict[backer_id]['key']['id'] = datalib.get_short_key(app.rs, key_id)
-					backer_dict[backer_id]['key']['badges'] = 0
+					backer_dict[backer_id]['key']['id'] = key_id
+					backer_dict[backer_id]['key']['rewards'] = datalib.get_rewards(app.rs, key_id)
 
 					# Aggregate Clicks
 					total_clicks += int(backer_dict[backer_id]['key']['clicks'])

@@ -46,19 +46,27 @@
               {{ backers[backer].name }}
             </a>
           </h2>
-          <i class="icon-globe"></i> {{ backers[backer].location }}
-          <br>
+          {% if backers[backer].location %}
+            <i class="icon-globe"></i> {{ backers[backer].location }}
+            <br>
+          {% endif %}
           <i class="icon-user"></i> Since {{ backers[backer]['key']['created'].strftime('%B %d') }}
         </div>
         <div class="backer-stats">
          <h1>
              {{ backers[backer]['key']['clicks'] }} Clicks
          </h1>
+             <a target='_blank' href="http://demo.awe.sm/{{ backers[backer]['key']['id'] }}">http://demo.awe.sm/{{ backers[backer]['key']['id'] }}</a>
         </div>
         <div class="backer-badges">
          <h1>
-             {{ backers[backer]['key']['badges'] }} Rewards
+             {{ backers[backer]['key']['rewards']|length }} Rewards
          </h1>
+             {% if backers[backer]['key']['rewards']|length > 0 %}
+              {% for reward in backers[backer]['key']['rewards'] %}
+                <i class="icon-bookmark"></i> {{ reward }} <br>
+              {% endfor %}
+             {% endif %}
         </div>
       </div>
     </div>
