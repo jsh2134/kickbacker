@@ -37,6 +37,27 @@ def find_attr(attr_name, attr_list):
 							(attr_name, attr_list))
 	return None
 
+def get_backer_id(url, full_url=True):
+       """ URL is in the form /profile/<id or name>/ unless full_url is pasesed
+               For now we will assume this is unique """
+       if full_url:
+               id_match = re.compile('.*\/profile\/(\w+)\/?.*')
+               find_bid = id_match.match(url)
+               return find_bid.groups()[0]
+       else:
+               return url.replace('/profile/', '')
+
+
+def get_project_id(url):
+       id_match = re.compile('.*\/projects\/(\w+)\/.*')
+       find_pid = id_match.match(url)
+       if find_pid:
+               pid = find_pid.groups()[0]
+       else:
+               logging.info('could not find a pid in %s' % (url))
+               pid = url
+
+       return pid
 
 
 #############################
@@ -58,17 +79,33 @@ def parse_backer_page(backer_id, soup):
 			   'url': BACKER_URL % (backer_id)
 			}
 
-	img_div= soup.findAll("div", {"id":"profile-avatar"})
-	backer['img'] = find_attr('src', img_div[0].img.attrs)
+	try:
+		img_div = soup.findAll("div", {"id":"profile-avatar"})
+		backer['img'] = find_attr('src', img_div[0].img.attrs)
+	except:
+		logging.exception("Could not find backer 'img' attr")
+		backer['img'] = ''
 
-	name_div= soup.findAll("div", {"id":"profile-bio"})
-	backer['name'] = name_div[0].h2.contents[0].replace('\n','').strip()
+	try:
+		name_div = soup.findAll("div", {"id":"profile-bio"})
+		backer['name'] = name_div[0].h2.contents[0].replace('\n','').strip()
+	except:
+		logging.exception("Could not find backer 'name' attr")
+		backer['name'] = ''
 
-	loc_div= soup.findAll("div", {"class":"location"})
-	backer['location'] = loc_div[0].contents[1].strip()
+	try:
+		loc_div = soup.findAll("div", {"class":"location"})
+		backer['location'] = loc_div[0].contents[1].strip()
+	except:
+		logging.exception("Could not find backer 'location' attr")
+		backer['location'] = ''
 
-	bio_div= soup.findAll("div", {"class":"bio"})
-	backer['bio'] = bio_div[0].p.contents[0].strip()
+	try:
+		bio_div = soup.findAll("div", {"class":"bio"})
+		backer['bio'] = bio_div[0].p.contents[0].strip()
+	except:
+		logging.exception("Could not find backer 'bio' attr")
+		backer['bio'] = ''
 
 	return backer
 
