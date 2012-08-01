@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="row">
+  <div class="span4">
+  {% include 'get_project.html' %}
+  </div>
+  <div class="span8">
+    <div class='buzzword-wrapper'>
+      <div class="buzzword-elem">
+        <div class="bw-text">
+          <p class="lead">
+            Sign up for <b>kickbacker.co</b> Link and Share your with your network on Twitter, Facebook and elsewhere
+          </p>
+        </div>
+        <div class="bw-screen">
+          <img class="thumb" src="http://placehold.it/300x200">
+        </div>
+      </div>
+      <div class="buzzword-elem">
+        <div class="bw-text">
+          <p class="lead">
+            Help fund projects you are committed to by competing against other kickbackers in driving traffic and earning rewards
+          </p>
+        </div>
+        <div class="bw-screen">
+          <img class="thumb" src="http://placehold.it/300x200">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

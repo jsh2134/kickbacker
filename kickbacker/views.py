@@ -20,7 +20,7 @@ def make_timestamp(time_str, time_format="%Y-%m-%d %H:%M:%S.%f"):
 
 def respond_index(project_id):
 	project = datalib.get_project(app.rs, project_id)
-	return render_template('get_project.html', project=project)
+	return render_template('index.html', project=project)
 
 
 def show_backer(backer):
@@ -61,6 +61,7 @@ def key_redirect(project_id, backer_id):
 	key = raw_key.split('_')[1]
 	redirect_url = datalib.get_redirect(app.rs, key)
 
+	# TODO if you have cookie don't count
 	# Increment Clicks
 	datalib.increment_short_key_value(app.rs, key, 'clicks')
 	datalib.increment_backer_value(app.rs, backer_id, 'clicks')

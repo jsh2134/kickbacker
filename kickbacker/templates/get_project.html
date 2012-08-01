@@ -35,33 +35,41 @@ $(function () {
 {% endblock header %}
 
 {% block content %}
-<form class="form-vertical well" >
-  <fieldset class="control-group">
-    {% if project %}
-          <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
-    {% else %}
+
+<div class='signup'>
+  <form class="form-vertical well" >
+    <fieldset class="control-group">
+      {% if project %}
+            <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+      {% else %}
+        <div class="control-group">
+          <label class="control-label">Kickstarter Project URL: 
+            <span class='help-inline'>
+              <a style='font-size:10px;' href='#'>What is this?</a>
+            </span>
+          </label>
+          <div class="controls">
+            <input id="ks-url" name="url" type="text" class='input-xlarge' placeholder='http://kickstarter.com/projects/307436684/three-and-a-half-pike'>
+          </div>
+        </div>
+      {% endif %}
       <div class="control-group">
-        <label class="control-label">Kickstarter Project: </label>
+        <label class="control-label">Kickstarter Profile URL:
+            <span class='help-inline'>
+              <a style='font-size:10px;' href='#'>What is this?</a>
+            </span>
+          </label>
         <div class="controls">
-          <input id="ks-url" name="url" type="text" class='input-xlarge' value='http://www.kickstarter.com/projects/307436684/three-and-a-half-pike?ref=users'>
+          <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' placeholder="http://kickstarter.com/profile/jeffhull">
         </div>
       </div>
-    {% endif %}
-    <div class="control-group">
-      <label class="control-label">Kickstarter Profile: </label>
-      <div class="controls">
-        <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' value="http://www.kickstarter.com/profile/jeffhull">
+      <div id='your-link'>
+        <textarea id='your-link-area' class='input-xlarge'>
+        </textarea>
       </div>
-    </div>
-    <button id='go' type="button" onclick='display_url()' class="btn btn-primary">Create Your Link!</button>
-
-  <div id='your-link'>
-    <textarea id='your-link-area' class='input-large' style='margin-top:15px; font-size:1.6em;'>
-      Your Kickbacker Link Here
-    </textarea>
-  </div>
-</fieldset>
-</form>
-
+      <button id='go' type="button" onclick='display_url()' class="btn btn-success" style='float:right;'>Earn Kickbacks!</button>
+  </fieldset>
+  </form>
+</div>
 
 {% endblock content %}

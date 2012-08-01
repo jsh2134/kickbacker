@@ -1,4 +1,8 @@
 
+.main-container{
+	margin:20px;
+}
+
 .project_wrap {
 	display:table;
 }
@@ -18,6 +22,9 @@
 	display:table-cell;
 }
 
+
+/** Project Leaderboard **/
+
 .project-title {
 	font-size:2em;
 }
@@ -27,7 +34,6 @@
 .project-clicks {
 	font-size:1.3em;
 }
-
 
 .project-leaderboard {
 	margin:20px;
@@ -64,5 +70,39 @@
 img.thumb {
 	margin:5px 10px;
 	float:left;
+}
+
+/** URL Signup **/
+.signup {
+	width:325px;
+	margin:10px;
+}
+
+
+#your-link {
+	display:none;
+}
+
+#your-link-area {
+	margin-top:15px; 
+	font-size:1.6em;
+}
+
+/** Markitechture **/
+.buzzword-wrapper {
+}
+.buzzword-elem {
+	display:table;
+	vertical-align:middle;
+}
+.bw-text {
+	display:table-cell;
+	vertical-align:middle;
+	width:300px;
+}
+.bw-screen {
+	display:table-cell;
+	vertical-align:middle;
+	width:360px;
 }
 
