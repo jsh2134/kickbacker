@@ -1,7 +1,7 @@
 flask
 redis
-BeautifulSoup=3.2
+BeautifulSoup==3.2
+fabric
 celery
 celery-with-redis
-
 
