@@ -20,7 +20,13 @@ def make_timestamp(time_str, time_format="%Y-%m-%d %H:%M:%S.%f"):
 
 def respond_index(project_id):
 	project = datalib.get_project(app.rs, project_id)
-	return render_template('index.html', project=project)
+	# Redirect to backer focused page
+	if project_id:
+		lead_type = 'backer'
+	else:
+		lead_type = 'owner'
+	return render_template('index.html', project=project,
+										 lead_type=lead_type)
 
 
 def show_backer(backer):
@@ -119,6 +125,20 @@ def create_new_project(backer_id, project_id, key, kb_url, url):
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
 	datalib.update_short_key(app.rs, key, 'backer_id', backer_id)
 
+def projectboard():
+	""" Display stats about all projects"""	
+	project_dict={}
+	projects = datalib.get_projects(app.rs)
+	total_clicks = 0
+	for project_id in projects:
+		project_dict[project_id] = datalib.get_project(app.rs, project_id)
+
+		if 'clicks' in project_dict[project_id]:
+			total_clicks += int(project_dict[project_id]['clicks'])
+
+	return render_template('show_projectboard.html',
+								projects = project_dict,
+								total_clicks = total_clicks)
 
 def dashboard():
 	""" Display stats about all projects"""	

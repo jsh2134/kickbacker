@@ -74,7 +74,7 @@ img.thumb {
 
 /** URL Signup **/
 .signup {
-	width:325px;
+	width:340px;
 	margin:10px;
 }
 
@@ -86,6 +86,12 @@ img.thumb {
 #your-link-area {
 	margin-top:15px; 
 	font-size:1.6em;
+}
+
+.showcase {
+	background-image: url(/static/img/home-showcase.png);
+	background-repeat: repeat-x;
+
 }
 
 /** Markitechture **/

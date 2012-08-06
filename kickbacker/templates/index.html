@@ -1,35 +1,54 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
-
 <div class="row">
-  <div class="span4">
-  {% include 'get_project.html' %}
-  </div>
   <div class="span8">
+    {% if lead_type == 'backer' %}
+      <h1>Earn Rewards by Sharing</h1>
+    {% elif lead_type == 'owner' %}
+      <h1>Your Backers are your Biggest Fans</h1>
+    {% endif %}
     <div class='buzzword-wrapper'>
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
-            Sign up for <b>kickbacker.co</b> Link and Share your with your network on Twitter, Facebook and elsewhere
+            {% if lead_type == 'backer' %}
+              Help fund projects you are backing by competing against other kickbackers in driving traffic and earning rewards.
+            {% elif lead_type == 'owner' %}
+             Incentivize your backers to spread the word about your project. Reward them for driving more backers and more hits to your project page.
+            {% endif %}
           </p>
         </div>
         <div class="bw-screen">
-          <img class="thumb" src="http://placehold.it/300x200">
+            {% if lead_type == 'backer' %}
+              <img class="thumb" src="http://placehold.it/300x200">
+            {% elif lead_type == 'owner' %}
+              <img class="thumb" src="http://placehold.it/300x200">
+            {% endif %}
         </div>
       </div>
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
-            Help fund projects you are committed to by competing against other kickbackers in driving traffic and earning rewards
+            {% if lead_type == 'backer' %}
+              Signup for a <b>kickbacker.co</b> Link and Share with your network on Twitter, Facebook and elsewhere.
+            {% elif lead_type == 'owner' %}
+              Signup for kickbacker, share your link with your backers, and fund your project! 
+            {% endif %}
           </p>
         </div>
         <div class="bw-screen">
-          <img class="thumb" src="http://placehold.it/300x200">
+            {% if lead_type == 'backer' %}
+              <img class="thumb" src="http://placehold.it/300x200">
+            {% elif lead_type == 'owner' %}
+              <img class="thumb" src="http://placehold.it/300x200">
+            {% endif %}
         </div>
       </div>
     </div>
+  </div>
+  <div class="span4">
+  {% include 'get_project.html' %}
   </div>
 </div>
 

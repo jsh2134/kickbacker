@@ -35,6 +35,10 @@ def respond_redirect(project_id, backer_id):
 def respond_dashboard():
 	return views.dashboard()
 
+@app.route('/projectboard')
+def respond_projectboard():
+	return views.projectboard()
+
 @app.route('/<project_id>/leaderboard')
 def respond_leaderboard(project_id):
 	return views.leaderboard(project_id)

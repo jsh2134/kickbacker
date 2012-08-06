@@ -1,10 +1,14 @@
-{% extends 'base.html' %}
 
 {% block header %}
  <script type='text/javascript' src='/static/js/kickbacker.js'></script>
+ <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
+ <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
 
  <script type='text/javascript'>
 $(function () {
+  var poptions = { 'placement': 'left' };
+  $('#ks-url-help').popover(poptions);
+  $('#ks-profile-help').popover(poptions);
   $('#ks-url').keyup(function() {
     url = $('#ks-url').val();
     if (is_valid_kickstarter_url(url) == false) {
@@ -38,14 +42,15 @@ $(function () {
 
 <div class='signup'>
   <form class="form-vertical well" >
-    <fieldset class="control-group">
-      {% if project %}
+   <h2>Get Your KickBacker Link</h2> 
+   <fieldset class="control-group">
+      {% if lead_type == 'backer' %}
             <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
       {% else %}
         <div class="control-group">
           <label class="control-label">Kickstarter Project URL: 
             <span class='help-inline'>
-              <a style='font-size:10px;' href='#'>What is this?</a>
+              <a style='font-size:10px;' id='ks-url-help' rel='popover' href='#' data-original-title='Kickstarter Project URL' data-content='Enter the URL of the project you wish to promote. You can get the kickstarter project URL by going to the Kickstarter page for that project, and copy and pasting the link here. <br><br> It will be in the format <b>http://kickstarter.com/projects/project-shortname-or-id/full-project-name</b>'>What is this?</a>
             </span>
           </label>
           <div class="controls">
@@ -56,7 +61,7 @@ $(function () {
       <div class="control-group">
         <label class="control-label">Kickstarter Profile URL:
             <span class='help-inline'>
-              <a style='font-size:10px;' href='#'>What is this?</a>
+              <a style='font-size:10px;' id='ks-profile-help' rel='popover' href='#' data-original-title='Kickstarter Profile URL' data-content='You can get your kickstarter profile URL by logging into Kickstarter, going to your profile page, and copy and pasting the link here. <br><br> It will be in the format <b>http://kickstarter.com/profile/your-name-or-id</b>'>What is this?</a>
             </span>
           </label>
         <div class="controls">
@@ -70,6 +75,31 @@ $(function () {
       <button id='go' type="button" onclick='display_url()' class="btn btn-success" style='float:right;'>Earn Kickbacks!</button>
   </fieldset>
   </form>
+  {% if project %}
+    <hr>
+    <div id='project-{{project.id}}' class='project-leaderboard'>
+        <div class="thumbnail" style='height:120px;'>
+          <a href="http://kickstarter.com/{{project.link}}">
+            <img src='{{project.img}}' width='150px' class='thumb'>
+          </a>
+          <h1>Kickbacker Leaderboard</h1>
+          <div class="caption">
+            <a href="http://kickstarter.com/{{project.link}}">
+              <span class='project-title'>{{ project.name }}</span>
+            </a>
+            <p>
+              <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+              <br><br>
+              <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
+              &nbsp;&nbsp;
+              <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
+            </p>
+          </div>
+    </div>
+
+  {% endif %}
 </div>
+
+
 
 {% endblock content %}

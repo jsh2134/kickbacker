@@ -1,0 +1,31 @@
+
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock%}
+
+{% block content %}
+
+<!-- <h2>{{ total_clicks }} Total Clicks</h2> -->
+{% for project in projects %}
+
+<div class='project-float' style='float:left;margin:5px;'>
+  <div id='project-{{project}}'>
+    <span style='font-size:16px;margin-left:5px;'>
+      <a href="/{{ project }}/leaderboard?ref=projectboard">{{ projects[project].name }}</a>
+    </span>
+    <br>
+    <span style='margin-left:10px;'>
+    {{ projects[project]['clicks'] }} Total Project Clicks
+    </span>
+    <br>
+    <a href="/{{ project }}/leaderboard?ref=projectboard">
+      <img src='{{projects[project].img}}' width='200' style='margin:5px;'>
+    </a>
+    </div>
+
+  </div>
+{% endfor %}
+
+{% endblock content %}
+
