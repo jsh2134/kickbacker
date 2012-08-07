@@ -41,11 +41,26 @@ $(function () {
 {% block content %}
 
 <div class='signup'>
+
   <form class="form-vertical well" >
    <h2>Get Your KickBacker Link</h2> 
    <fieldset class="control-group">
       {% if lead_type == 'backer' %}
-            <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+          <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+          <div id='project-{{project.id}}' class='index-project-leaderboard'>
+            <p>
+            <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='100px' class='thumb'></a>
+            <h3>Supporting</h3>
+            <a href="http://kickstarter.com/{{project.link}}"><span class='index-project-title'>{{ project.name }}</span></a>
+              <br>
+              <span class='index-project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+              <br><br>
+              {% if backers %}
+                <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
+              {% endif %}
+            </p>
+          </div>
+        <hr>
       {% else %}
         <div class="control-group">
           <label class="control-label">Kickstarter Project URL: 
@@ -72,32 +87,15 @@ $(function () {
         <textarea id='your-link-area' class='input-xlarge'>
         </textarea>
       </div>
-      <button id='go' type="button" onclick='display_url()' class="btn btn-success" style='float:right;'>Earn Kickbacks!</button>
+      <button id='go' type="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
+        {% if lead_type == 'backer' %}
+          Start Earning Kickbacks!
+        {% else %}
+          Sign Up!
+        {% endif %}
+      </button>
   </fieldset>
   </form>
-  {% if project %}
-    <hr>
-    <div id='project-{{project.id}}' class='project-leaderboard'>
-        <div class="thumbnail" style='height:120px;'>
-          <a href="http://kickstarter.com/{{project.link}}">
-            <img src='{{project.img}}' width='150px' class='thumb'>
-          </a>
-          <h1>Kickbacker Leaderboard</h1>
-          <div class="caption">
-            <a href="http://kickstarter.com/{{project.link}}">
-              <span class='project-title'>{{ project.name }}</span>
-            </a>
-            <p>
-              <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
-              <br><br>
-              <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
-              &nbsp;&nbsp;
-              <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
-            </p>
-          </div>
-    </div>
-
-  {% endif %}
 </div>
 
 

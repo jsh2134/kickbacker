@@ -1,3 +1,12 @@
+body {
+	background-image:url('/static/img/standingFans.jpg');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+img {
+	max-width:100%;
+}
 
 .main-container{
 	margin:20px;
@@ -88,18 +97,33 @@ img.thumb {
 	font-size:1.6em;
 }
 
-.showcase {
-	background-image: url(/static/img/home-showcase.png);
-	background-repeat: repeat-x;
-
+.index-project-leaderboard {
+	height:75px;
+}
+.index-project-author {
+	font-size:1em;
+}
+.index-project-title {
+	margin-top:20px;
+	font-size:1.3em;
+}
+.index-project-clicks {
+	font-size:1.3em;
 }
 
 /** Markitechture **/
 .buzzword-wrapper {
+	padding:0;
+}
+.buzzword-head {
+	width:550px;
+	margin:0;
+	padding:0;
 }
 .buzzword-elem {
 	display:table;
 	vertical-align:middle;
+	width:550px;
 }
 .bw-text {
 	display:table-cell;
@@ -109,6 +133,8 @@ img.thumb {
 .bw-screen {
 	display:table-cell;
 	vertical-align:middle;
-	width:360px;
+	text-align:center;
+	width:240px;
+	padding:5px 0px 5px 20px;
 }
 

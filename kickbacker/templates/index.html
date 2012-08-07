@@ -2,18 +2,20 @@
 
 {% block content %}
 <div class="row">
-  <div class="span8">
+  <div class="span7 well">
+    <div class='buzzword-head'>
     {% if lead_type == 'backer' %}
       <h1>Earn Rewards by Sharing</h1>
     {% elif lead_type == 'owner' %}
       <h1>Your Backers are your Biggest Fans</h1>
     {% endif %}
+    </div>
     <div class='buzzword-wrapper'>
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
             {% if lead_type == 'backer' %}
-              Help fund projects you are backing by competing against other kickbackers in driving traffic and earning rewards.
+              Help fund <b>{{ project.name }}</b> by competing against other kickbackers in driving traffic and earning rewards.
             {% elif lead_type == 'owner' %}
              Incentivize your backers to spread the word about your project. Reward them for driving more backers and more hits to your project page.
             {% endif %}
@@ -21,9 +23,9 @@
         </div>
         <div class="bw-screen">
             {% if lead_type == 'backer' %}
-              <img class="thumb" src="http://placehold.it/300x200">
+              <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
             {% elif lead_type == 'owner' %}
-              <img class="thumb" src="http://placehold.it/300x200">
+              <img class="thumb" src="/static/img/backers-listed.png" width='225px'>
             {% endif %}
         </div>
       </div>
@@ -39,9 +41,9 @@
         </div>
         <div class="bw-screen">
             {% if lead_type == 'backer' %}
-              <img class="thumb" src="http://placehold.it/300x200">
+              <img class="thumb" src="/static/img/followers4.jpg" width='185px'>
             {% elif lead_type == 'owner' %}
-              <img class="thumb" src="http://placehold.it/300x200">
+              <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
             {% endif %}
         </div>
       </div>
