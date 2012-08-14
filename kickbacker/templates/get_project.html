@@ -9,26 +9,38 @@ $(function () {
   var poptions = { 'placement': 'left' };
   $('#ks-url-help').popover(poptions);
   $('#ks-profile-help').popover(poptions);
+  $('#ks-email-help').popover(poptions);
   $('#ks-url').keyup(function() {
     url = $('#ks-url').val();
-    if (is_valid_kickstarter_url(url) == false) {
+    if (is_valid_kickstarter_url(url, 'project') == false) {
        $('#ks-url').addClass('error');
        $('#go').attr('disabled', 'disabled');
     } else {
        $('#ks-url').removeClass('error');
-        if (is_valid_kickstarter_url($('#ks-profile').val()) == true) {
+        if (is_valid_submit() == true) {
           $('#go').removeAttr('disabled');
         }
     }
   });
   $('#ks-profile').keyup(function() {
     url = $('#ks-profile').val();
-    if (is_valid_kickstarter_url(url) == false) {
+    if (is_valid_kickstarter_url(url, 'backer') == false) {
        $('#ks-profile').addClass('error');
        $('#go').attr('disabled', 'disabled');
     } else {
        $('#ks-profile').removeClass('error');
-        if (is_valid_kickstarter_url($('#ks-url').val()) == true) {
+        if (is_valid_submit() == true) {
+          $('#go').removeAttr('disabled');
+        }
+    }
+  });
+  $('#ks-email').keyup(function() {
+    if (is_valid_email() == false) {
+       $('#ks-email').addClass('error');
+       $('#go').attr('disabled', 'disabled');
+    } else {
+       $('#ks-email').removeClass('error');
+        if (is_valid_submit() == true) {
           $('#go').removeAttr('disabled');
         }
     }
@@ -46,7 +58,7 @@ $(function () {
    <h2>Get Your KickBacker Link</h2> 
    <fieldset class="control-group">
       {% if lead_type == 'backer' %}
-          <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+          <!-- Project Header -->
           <div id='project-{{project.id}}' class='index-project-leaderboard'>
             <p>
             <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='100px' class='thumb'></a>
@@ -61,39 +73,66 @@ $(function () {
             </p>
           </div>
         <hr>
-      {% else %}
-        <div class="control-group">
-          <label class="control-label">Kickstarter Project URL: 
-            <span class='help-inline'>
-              <a style='font-size:10px;' id='ks-url-help' rel='popover' href='#' data-original-title='Kickstarter Project URL' data-content='Enter the URL of the project you wish to promote. You can get the kickstarter project URL by going to the Kickstarter page for that project, and copy and pasting the link here. <br><br> It will be in the format <b>http://kickstarter.com/projects/project-shortname-or-id/full-project-name</b>'>What is this?</a>
-            </span>
-          </label>
-          <div class="controls">
-            <input id="ks-url" name="url" type="text" class='input-xlarge' placeholder='http://kickstarter.com/projects/307436684/three-and-a-half-pike'>
-          </div>
-        </div>
       {% endif %}
+      <!-- Begin Email Info -->
       <div class="control-group">
-        <label class="control-label">Kickstarter Profile URL:
+         <label class="control-label">Email Address:
             <span class='help-inline'>
-              <a style='font-size:10px;' id='ks-profile-help' rel='popover' href='#' data-original-title='Kickstarter Profile URL' data-content='You can get your kickstarter profile URL by logging into Kickstarter, going to your profile page, and copy and pasting the link here. <br><br> It will be in the format <b>http://kickstarter.com/profile/your-name-or-id</b>'>What is this?</a>
+              <a style='font-size:10px;' id='ks-email-help' rel='popover' href='#' data-original-title='Email Address' data-content='We will use your email address to identify your projects. We will only send you emails about your KickBacker account and project progress. We will never rent, sell, barter or exchange your information for any other purpose.'>Why?</a>
             </span>
           </label>
         <div class="controls">
-          <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' placeholder="http://kickstarter.com/profile/jeffhull">
+          <input id="ks-email" name="email" type="text" class='input-xlarge'>
+        </div>
+      </div>
+      <!-- Begin Project Info -->
+      {% if lead_type == 'backer' %}
+        <input id="kb-type" name="kb-type" type="hidden" value="backer">
+        <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+      {% else %}
+        <input id="kb-type" name="kb-type" type="hidden" value="owner">
+        <div class="control-group">
+          <label class="control-label">Kickstarter Project URL: 
+            <span class='help-inline'>
+              <a style='font-size:10px;' id='ks-url-help' rel='popover' href='#' data-original-title='Kickstarter Project URL' data-content='Enter the URL of the project you wish to promote. You can get the kickstarter project URL by going to the Kickstarter page for that project, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/projects/project-shortname-or-id/full-project-name</b>'>What is this?</a>
+            </span>
+          </label>
+          <div class="controls">
+            <input id="ks-url" name="url" type="text" class='input-xlarge' placeholder='http://kickstarter.com/projects/1418932/the-five-points'>
+          </div>
+        </div>
+      {% endif %}
+      <!-- Begin Backer Info -->
+      <div class="control-group">
+        <label class="control-label">Kickstarter Profile URL:
+            <span class='help-inline'>
+              <a style='font-size:10px;' id='ks-profile-help' rel='popover' href='#' data-original-title='Kickstarter Profile URL' data-content='You can get your kickstarter profile URL by logging into Kickstarter, going to your profile page, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/profile/your-name-or-id</b>'>What is this?</a>
+            </span>
+          </label>
+        <div class="controls">
+          <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' placeholder="http://kickstarter.com/profile/bill-the-butcher">
         </div>
       </div>
       <div id='your-link'>
         <textarea id='your-link-area' class='input-xlarge'>
         </textarea>
+        <span class='help-inline'>
+          {% if lead_type == 'backer' %}
+            Copy Your Link and Go!
+          {% else %}
+            Copy Your Link, Share with your Backers and Go!
+          {% endif %}
+        </span>
       </div>
-      <button id='go' type="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
-        {% if lead_type == 'backer' %}
-          Start Earning Kickbacks!
-        {% else %}
-          Sign Up!
-        {% endif %}
-      </button>
+      <div id="button-div">
+        <button id='go' type="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
+          {% if lead_type == 'backer' %}
+            Start Earning Kickbacks!
+          {% else %}
+            Sign Up!
+          {% endif %}
+        </button>
+      </div>
   </fieldset>
   </form>
 </div>

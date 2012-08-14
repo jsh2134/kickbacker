@@ -1,3 +1,24 @@
+#######################
+# Kickbacker Methods
+#######################
+
+# Kickbacker
+def add_kickbacker(rs, email):
+	""" Add a Kickbacker """
+	rs.sadd('kickbacker', email)
+
+def get_kickbackers(rs):
+	""" Return all kickbackers"""
+	rs.smembers('kickbacker')
+
+def update_kickbacker(rs, email, key, value):
+	""" Add metadata to Kickbacker """
+	rs.hset('kickbacker:%s' % email, key, value)
+
+def get_kickbacker(rs, email):
+	""" Return metadata for KickBacker"""
+	rs.hgetall('kickbacker:%s' % email)
+
 
 #####################
 # Project Methods

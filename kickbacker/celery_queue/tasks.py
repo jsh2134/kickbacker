@@ -9,8 +9,8 @@ def harvest_project(url):
 	kickstarter.get_project(url)
 
 @celery.task
-def harvest_backer(url):
-	kickstarter.get_backer(url)
+def harvest_backer(url, backer_type):
+	kickstarter.get_backer(url, backer_type)
 
 
 

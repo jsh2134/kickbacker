@@ -339,7 +339,7 @@ def get_project(project_url):
 	return project_dict
 
 
-def get_backer(backer_url):
+def get_backer(backer_url, backer_type):
 
 	logging.info("Parsing URL %s" % (backer_url) )
 
@@ -353,6 +353,9 @@ def get_backer(backer_url):
 		a = datalib.update_backer(app.rs, backer_id, key, value)
 		logging.info('%s %s: %s for %s' % ("Added" if a else "Existed", key, value, backer_id))
 	
+	# Add Backer Type 
+	datalib.update_backer(app.rs, backer_id, 'type', backer_type)
+
 	return backer_dict
 
 

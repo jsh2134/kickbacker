@@ -67,6 +67,8 @@ def key_redirect(project_id, backer_id):
 	key = raw_key.split('_')[1]
 	redirect_url = datalib.get_redirect(app.rs, key)
 
+	redirect_url = '%s?ref=kickbacker' % (redirect_url)
+
 	# TODO if you have cookie don't count
 	# Increment Clicks
 	datalib.increment_short_key_value(app.rs, key, 'clicks')
@@ -94,26 +96,34 @@ def add_short_key():
 	kb_url = request.form.get('kb_url')
 	backer_id = request.form.get('backer_id')
 	project_id = request.form.get('project_id')
+	email = request.form.get('email')
+	kb_type = request.form.get('kb_type')
 	
 	url = lib.strip_url_args(url)
 
-	create_new_project(backer_id, project_id, key, kb_url, url)
+	create_new_project(backer_id, project_id, key, kb_url, \
+						url, email, kb_type)
 
 	return jsonify( {   'success':True, 
 						'message':'Added key:%s for backer:%s to project:%s' \
 									% (key, backer_id, project_id)})
 
 
-def create_new_project(backer_id, project_id, key, kb_url, url):
+def create_new_project(backer_id, project_id, key, \
+						kb_url, url, email, kb_type):
 
 	# Queue up backer scrape job
 	if datalib.add_backer(app.rs, backer_id):
-		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id))
+		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id), kb_type)
 
 	# Queue up project scrape job
 	if datalib.add_project(app.rs, project_id):
 		tasks.harvest_project.delay(url)
 
+	datalib.add_kickbacker(app.rs, email)
+	datalib.update_kickbacker(app.rs, email, 'project', project_id)
+	datalib.update_kickbacker(app.rs, email, 'backer',  backer_id)
+	datalib.update_kickbacker(app.rs, email, 'backer_type',  kb_type)
 	datalib.add_project_backer(app.rs, project_id, backer_id)
 	datalib.add_short_key(app.rs, key)
 	datalib.add_backer_short_key(app.rs, backer_id, key)
@@ -121,9 +131,11 @@ def create_new_project(backer_id, project_id, key, kb_url, url):
 	datalib.add_redirect(app.rs, key, url)
 	datalib.update_short_key(app.rs, key, 'clicks', 0)
 	datalib.update_short_key(app.rs, key, 'url', url)
-	datalib.update_short_key(app.rs, key, 'created', datetime.datetime.now())
+	datalib.update_short_key(app.rs, key, 'created', \
+										datetime.datetime.now())
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
 	datalib.update_short_key(app.rs, key, 'backer_id', backer_id)
+	datalib.update_short_key(app.rs, key, 'backer_type',  kb_type)
 
 def projectboard():
 	""" Display stats about all projects"""	
@@ -187,20 +199,24 @@ def leaderboard(project_id):
 		total_clicks = 0
 		backer_dict = {}
 		for backer_id in project_backers:
-			backer_dict[backer_id] = datalib.get_backer(app.rs, backer_id)
-			backer_key_list = datalib.get_backer_short_keys(app.rs, backer_id)
-			for key_id in backer_key_list:
-				if key_id in project_keys:
-					backer_dict[backer_id]['key'] = datalib.get_short_key(app.rs, key_id)
-					backer_dict[backer_id]['key']['id'] = key_id
-					backer_dict[backer_id]['key']['rewards'] = datalib.get_rewards(app.rs, key_id)
+			backer_info = datalib.get_backer(app.rs, backer_id)
+			# Ignore Owners
+			# TODO remove this when data is wiped
+			if 'backer_type' not in backer_info or backer_info['backer_type'] == 'backer':
+				backer_dict[backer_id] = backer_info
+				backer_key_list = datalib.get_backer_short_keys(app.rs, backer_id)
+				for key_id in backer_key_list:
+					if key_id in project_keys:
+						backer_dict[backer_id]['key'] = datalib.get_short_key(app.rs, key_id)
+						backer_dict[backer_id]['key']['id'] = key_id
+						backer_dict[backer_id]['key']['rewards'] = datalib.get_rewards(app.rs, key_id)
 
-					# Aggregate Clicks
-					total_clicks += int(backer_dict[backer_id]['key']['clicks'])
-					
-					# Format Timestamp
-					backer_dict[backer_id]['key']['created'] = \
-										make_timestamp(backer_dict[backer_id]['key']['created'])
+						# Aggregate Clicks
+						total_clicks += int(backer_dict[backer_id]['key']['clicks'])
+						
+						# Format Timestamp
+						backer_dict[backer_id]['key']['created'] = \
+											make_timestamp(backer_dict[backer_id]['key']['created'])
 
 		sorted_backers = backer_dict.keys()
 		sorted_backers.sort(lambda x,y: cmp(
