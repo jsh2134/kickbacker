@@ -6,7 +6,7 @@ class Config(object):
 	HOME = os.path.abspath(os.path.dirname(__file__)) + '/'
 	DEBUG = False
 	HOST = '0.0.0.0'
-	PORT = 8000
+	PORT = 5000
 	LOGFILE = '/var/log/kickbacker.log'
 	REDIS_HOST = 'localhost'
 	REDIS_PORT = '6379'
