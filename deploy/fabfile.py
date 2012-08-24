@@ -1,13 +1,15 @@
 import os
-import sys
 
 from fabric.api import env, settings
-from fabric.api import sudo, run, local, put
+from fabric.api import sudo, lcd, cd, run, local, put
 
 import ec2
 
 TMP_PATH = '/tmp/'
 HOME_DIR = '/home/jhull/workspace/kickbacker/kb'
+S3CFG_FILE = '.s3cfg'
+S3CFG_FP = os.path.join(HOME_DIR, 'deploy', S3CFG_FILE)
+KB_BUCKET = 's3://kickbacker/'
 HOSTS = {	
 			'jeffdev' : {   'user': 'jhull',
 							'host': 'office.buzzient.com:34343'
@@ -56,9 +58,16 @@ def install_web():
 	
 	with settings(warn_only=True):
 		sudo('useradd -U -m %s' % user)
+	
+	remote_code_dir = os.path.join(remote_home_dir, 'kb')
+	with settings(warn_only=True):
+		sudo('mkdir %s' % remote_code_dir)
 
 	# Install packages with yum
-	sudo('yum install -y python-devel gcc')
+	sudo('yum install -y python-devel gcc nginx')
+	
+	# Install s3cmd tools
+	install_s3cmd(remote_home_dir)
 
 	# Install pip
 	sudo('curl -O http://pypi.python.org/packages/source/p/pip/pip-1.0.tar.gz')
@@ -78,6 +87,8 @@ def install_web():
 	# Activate Virtual Env
 	#sudo('source %s/bin/activate' % venv)
 
+	# Copy over s3cmd config
+	put(S3CFG_FP, remote_home_dir, use_sudo=True)
 	
 	# Install python requirements
 	put('requirements.txt', remote_home_dir, use_sudo=True)
@@ -87,15 +98,30 @@ def install_web():
 	pyv = run("""python -c 'import sys; print "%s.%s" % (sys.version_info[0], sys.version_info[1])'""")
 	sudo("""sed -i 's/encoding.[^!]*=.*\"ascii\"/encoding=\"utf8\"/' %s/lib/python%s/site.py""" % (venv, pyv) )
 
-	update_code(HOME_DIR, remote_home_dir)
+	update_code(HOME_DIR, remote_code_dir)
+
+	# start nginx
+	put('nginx.conf', '/etc/nginx/', use_sudo=True)
+	sudo('service nginx start')
+
+
+def install_s3cmd(s3cfg_location):
+	put('s3tools.repo', '/etc/yum.repos.d/s3tools.repo', use_sudo=True)
+	put('.s3cfg', s3cfg_location, use_sudo=True)
+	sudo('yum install -y s3cmd')
 
 
 def update_code(plocal, premote):
-	local('tar -cvf %s/app.tar %s/' % (TMP_PATH, plocal))
+	with lcd(plocal):
+		local('git archive --format tar --output %s/app.tar master' % (TMP_PATH))
 	local('gzip -f %s/app.tar' % (TMP_PATH))
-	put('%s/app.tar.gz' % (TMP_PATH), premote, use_sudo=True)
+	local('s3cmd --config=%s put %s/app.tar.gz %s/' % \
+								(S3CFG_FP, TMP_PATH, KB_BUCKET ))
+	sudo('s3cmd get --config=%s/%s %s/app.tar.gz %s' % \
+								(premote, S3CFG_FILE, KB_BUCKET, premote))
 	sudo('gunzip %s/app.tar.gz' % (premote))
-	sudo('tar -xvf %s/app.tar %s' % (premote, premote))
+	with cd(premote):
+		sudo('tar -xvf %s/app.tar' % (premote) )
 
 
 # Test Functions
