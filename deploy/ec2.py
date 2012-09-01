@@ -1,19 +1,15 @@
 from boto.ec2.connection import EC2Connection
 from secrets import AWS
+from deploy.amazon_settings import aws_defaults, MAIN_IP
 
-import sys
 import time
-
-MAIN_IP = '23.23.78.193'
-MAIN_SG = 'kp1'
-MAIN_KP = 'jeffec2'
 
 SERVER_TYPES = {
 			'web' : {
-						'image_id' : 'ami-aecd60c7',
-						'instance_type' : 't1.micro',
-						'security_groups' : [MAIN_SG],
-						'key_name' : MAIN_KP,
+						'image_id' : aws_defaults['ami'],
+						'instance_type' : aws_defaults['size'],
+						'security_groups' : aws_defaults['security'],
+						'key_name' : aws_defaults['keypair']['name'],
 				},
 }
 

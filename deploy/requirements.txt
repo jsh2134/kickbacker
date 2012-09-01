@@ -5,3 +5,4 @@ celery
 celery-with-redis
 fabric
 boto
+supervisor
