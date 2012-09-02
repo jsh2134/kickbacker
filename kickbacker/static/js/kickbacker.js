@@ -18,7 +18,6 @@ function get_awesm_url(url, callback, err_callback) {
            'url': 'http://api.awe.sm/url'
            });
   }
-
 function get_backers(url, callback, err_callback) {
     $.ajax({ 'type': 'POST',
            'async': false, 
@@ -95,6 +94,7 @@ function build_kb_url(project_id, backer_id, kb_type) {
             + project_id + "/"
             + backer_id + "/"
   }
+}
 
 function clean_url(url) {
   var pattern = '([^?]*)';
