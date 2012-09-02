@@ -135,12 +135,17 @@ def install_web():
 	sudo('chown kickbacker:kickbacker /var/log/kickbacker.log')
 
 	# Deploy Code
-	update_code(HOME_DIR, remote_code_dir)
+	update_code()
 
 	# Install Redis
 	install_redis()
 
 	start_app()
+
+def update_server():
+	""" Update code on server """
+	update_code()
+	restart_app()
 
 def start_app():
 	# start nginx
@@ -149,27 +154,20 @@ def start_app():
 	# start supervisor
 	virtualenv('supervisord')
 
-	#virtualenv('supervisorctl start redis celery kickbacker')
-
-	# start redis
-	#sudo("service redis start")
-
-	# start celery
-	#with cd(os.path.join(code_dir,'kickabacker','celery_queue')):
-	#	run('celery -A tasks worker --loglevel=info')
-
-	# start app
-	#run('nohup python %s/handler.py > %s/app_log.log &' % (code_dir, code_dir), pty=False )
+def restart_app():
+	virtualenv('supervisorctl restart celery kickbacker')
 
 
-def update_code(plocal, premote):
-	with lcd(plocal):
+def update_code():
+	with lcd(HOME_DIR):
 		local('git archive --format=tar.gz --output %s HEAD' % \
 									os.path.join(TMP_PATH, 'app.tar.gz'))
-	put( os.path.join(TMP_PATH,'app.tar.gz'), os.path.join(premote, 'app.tar.gz'), use_sudo=True)
-	sudo('gunzip %s' % os.path.join(premote, 'app.tar.gz'))
-	with cd(premote):
-		sudo('tar -xvf %s' % os.path.join(premote, 'app.tar'))
+	put( os.path.join(TMP_PATH,'app.tar.gz'), os.path.join(env.directory, 'app.tar.gz'), use_sudo=True)
+	sudo('gunzip -f %s' % os.path.join(env.directory, 'app.tar.gz'))
+	with cd(env.directory):
+		sudo("find . -name '*.pyc' | xargs rm")
+		sudo('tar -xvf %s' % os.path.join(env.directory, 'app.tar'))
+
 
 def install_redis():
 
