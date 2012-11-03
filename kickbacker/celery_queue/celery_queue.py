@@ -5,7 +5,8 @@ from celery import Celery
 from kickbacker import app
 
 #TODO put these in a configuration file
-celery_server = Celery(broker = app.config['CELERY_BROKER'],
-				backend = app.config['CELERY_BACKEND'],
-				include = app.config['CELERY_INCLUDES'],
+celery_server = Celery(
+					broker = app.config['CELERY_BROKER'],
+					backend = app.config['CELERY_BACKEND'],
+					include = app.config['CELERY_INCLUDES'],
 				)

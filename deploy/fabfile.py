@@ -9,6 +9,7 @@ from kickbacker import app
 from deploy.amazon_settings import MAIN_IP, aws_defaults
 
 USER_HOME = '/home/jhull/'
+REMOTE_DIR = '/home/kickbacker/kb/'
 HOME_DIR = app.config['HOME']
 TMP_PATH = '/tmp/'
 S3CFG_FILE = '.s3cfg'
@@ -124,6 +125,7 @@ def install_web():
 	# Install Supervisor Config
 	sudo('mkdir %s/etc/' % venv)
 	sudo('mkdir /var/log/supervisord/')
+	sudo('chown kickbacker:kickbacker /var/log/supervisord')
 	put('supervisord.conf', '%s/etc/supervisord.conf' % venv, use_sudo=True)
 
 	# Update python encoding
@@ -154,6 +156,7 @@ def start_app():
 	# start supervisor
 	virtualenv('supervisord')
 
+
 def restart_app():
 	virtualenv('supervisorctl restart celery kickbacker')
 
@@ -162,11 +165,13 @@ def update_code():
 	with lcd(HOME_DIR):
 		local('git archive --format=tar.gz --output %s HEAD' % \
 									os.path.join(TMP_PATH, 'app.tar.gz'))
-	put( os.path.join(TMP_PATH,'app.tar.gz'), os.path.join(env.directory, 'app.tar.gz'), use_sudo=True)
-	sudo('gunzip -f %s' % os.path.join(env.directory, 'app.tar.gz'))
-	with cd(env.directory):
-		sudo("find . -name '*.pyc' | xargs rm")
-		sudo('tar -xvf %s' % os.path.join(env.directory, 'app.tar'))
+	put( os.path.join(TMP_PATH,'app.tar.gz'), os.path.join(REMOTE_DIR, 'app.tar.gz'), use_sudo=True)
+	sudo('gunzip -f %s' % os.path.join(REMOTE_DIR, 'app.tar.gz'))
+	with cd(REMOTE_DIR):
+		with settings(warn_only=True):
+			sudo("find . -name '*.pyc' | xargs rm")
+
+		sudo('tar -xvf %s' % os.path.join(REMOTE_DIR, 'app.tar'))
 
 
 def install_redis():
