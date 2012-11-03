@@ -13,22 +13,31 @@
 <input type=hidden value="{{project}}">
 
 <div id='project-{{project.id}}' class='project-leaderboard'>
-    <div class="thumbnail well" style='height:120px;'>
-      <a href="http://kickstarter.com/{{project.link}}">
-        <img src='{{project.img}}' width='150px' class='thumb'>
-      </a>
-      <h1>Kickbacker Leaderboard</h1>
-      <div class="caption">
+    <div class='project-leaderboard-container well' >
+      <div class='project-leaderboard-desc'>
         <a href="http://kickstarter.com/{{project.link}}">
-          <span class='project-title'>{{ project.name }}</span>
+          <img src='{{project.img}}' width='150px' class='thumb'>
         </a>
-        <p>
-          <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
-          <br><br>
-          <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
-          &nbsp;&nbsp;
-          <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
-        </p>
+        <h1>Kickbacker Leaderboard</h1>
+        <div class="caption">
+          <a href="http://kickstarter.com/{{project.link}}">
+            <span class='project-title'>{{ project.name }}</span>
+          </a>
+          <p>
+            <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+            <br><br>
+            <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
+            &nbsp;&nbsp;
+            <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
+          </p>
+        </div>
+      </div>
+      <div class='project-leaderboard-kickback' style='float:right;'>
+        <div>
+          <h3> KickBack Up For Grabs</h3>
+          <p class='reward-text'>A signed copy of the finished DVD and a limited edition jacket commemorating the project and your help. Your name will be on the t-shirt.</p>
+        <span style="font-size:24px;color:green">24d 12h 22m Remaining</span>
+        </div>
       </div>
 </div>
 

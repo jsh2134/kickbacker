@@ -47,6 +47,20 @@ img {
 .project-leaderboard {
 	margin:20px;
 }
+.project-leaderboard-container {
+	height:150px;
+}
+.project-leaderboard-desc {
+	float:left;
+	width:600px;
+}
+.project-leaderboard-kickback {
+	float:right;
+	width:300px;
+}
+.reward-text {
+	font-size:16px;
+}	
 
 .backer {
 	display:table;
