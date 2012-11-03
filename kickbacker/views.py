@@ -90,7 +90,7 @@ def key_redirect(project_id, backer_id):
 	return resp
 
 
-def add_short_key():
+def new_short_key():
 	key = request.form.get('key')
 	url = request.form.get('url')
 	kb_url = request.form.get('kb_url')
