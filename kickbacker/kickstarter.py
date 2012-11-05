@@ -98,7 +98,7 @@ def parse_backer_page(backer_id, soup):
 	except:
 		logging.exception("Could not find backer 'name' attr")
 		logging.exception(str(name_div))
-		backer['name'] = ''
+		backer['name'] = 'Unknown'
 
 	try:
 		loc_div = soup.findAll("div", {"class":"location"})
