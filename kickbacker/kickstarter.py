@@ -78,33 +78,44 @@ def parse_backer_page(backer_id, soup):
 	backer = { 'id': backer_id,
 			   'url': BACKER_URL % (backer_id)
 			}
-
+	logging.info(soup)
 	try:
-		img_div = soup.findAll("div", {"id":"profile-avatar"})
-		backer['img'] = find_attr('src', img_div[0].img.attrs)
+		img_div = soup.findAll("meta", {"property":"og:image"})
+		#img_div = soup.findAll("div", {"id":"profile-avatar"})
+		logging.info(img_div)
+		backer['img'] = find_attr('content', img_div[0].attrs)
 	except:
 		logging.exception("Could not find backer 'img' attr")
+		logging.exception(str(img_div))
 		backer['img'] = ''
 
 	try:
-		name_div = soup.findAll("div", {"id":"profile-bio"})
-		backer['name'] = name_div[0].h2.contents[0].replace('\n','').strip()
+		name_div = soup.findAll("meta", {"property":"og:title"})
+		logging.info(name_div)
+		backer['name'] = find_attr('content', name_div[0].attrs).replace('on Kickstarter','').strip()
+		#name_div = soup.findAll("div", {"id":"profile-bio"})
+		#backer['name'] = name_div[0].h1.contents[0].replace('\n','').strip()
 	except:
 		logging.exception("Could not find backer 'name' attr")
+		logging.exception(str(name_div))
 		backer['name'] = ''
 
 	try:
 		loc_div = soup.findAll("div", {"class":"location"})
+		logging.info(loc_div)
 		backer['location'] = loc_div[0].contents[1].strip()
 	except:
 		logging.exception("Could not find backer 'location' attr")
+		logging.exception(str(loc_div))
 		backer['location'] = ''
 
 	try:
 		bio_div = soup.findAll("div", {"class":"bio"})
+		logging.info(bio_div)
 		backer['bio'] = bio_div[0].p.contents[0].strip()
 	except:
 		logging.exception("Could not find backer 'bio' attr")
+		logging.exception(str(bio_div))
 		backer['bio'] = ''
 
 	return backer
@@ -134,6 +145,7 @@ def parse_project_page(project_id, soup):
 			project['author'] = author_a[0].h3.a.contents[0]
 		except:
 			logging.exception("Could not find project 'author' attr")
+			logging.exception(str(author_a))
 			project['author'] = ''
 
 		try:
