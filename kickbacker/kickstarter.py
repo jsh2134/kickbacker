@@ -11,6 +11,7 @@ import BeautifulSoup
 from kickbacker import app
 from kickbacker import datalib
 from kickbacker import lib
+from kickbacker import defaults
 
 KS_ROOT = 'http://www.kickstarter.com'
 BACKER_URL = KS_ROOT + '/profile/%s'
@@ -75,30 +76,26 @@ def parse_backer_page(backer_id, soup):
 		A dictionary of backer attributes
 	"""
 
-	backer = { 'id': backer_id,
-			   'url': BACKER_URL % (backer_id)
-			}
+	backer = defaults.BACKER
+	backer['id'] = backer_id
+	backer['url'] = BACKER_URL % (backer_id)
+			
 	logging.info(soup)
 	try:
 		img_div = soup.findAll("meta", {"property":"og:image"})
-		#img_div = soup.findAll("div", {"id":"profile-avatar"})
 		logging.info(img_div)
 		backer['img'] = find_attr('content', img_div[0].attrs)
 	except:
 		logging.exception("Could not find backer 'img' attr")
 		logging.exception(str(img_div))
-		backer['img'] = ''
 
 	try:
 		name_div = soup.findAll("meta", {"property":"og:title"})
 		logging.info(name_div)
 		backer['name'] = find_attr('content', name_div[0].attrs).replace('on Kickstarter','').strip()
-		#name_div = soup.findAll("div", {"id":"profile-bio"})
-		#backer['name'] = name_div[0].h1.contents[0].replace('\n','').strip()
 	except:
 		logging.exception("Could not find backer 'name' attr")
 		logging.exception(str(name_div))
-		backer['name'] = 'Unknown'
 
 	try:
 		loc_div = soup.findAll("div", {"class":"location"})
@@ -107,7 +104,6 @@ def parse_backer_page(backer_id, soup):
 	except:
 		logging.exception("Could not find backer 'location' attr")
 		logging.exception(str(loc_div))
-		backer['location'] = ''
 
 	try:
 		bio_div = soup.findAll("div", {"class":"bio"})
@@ -116,7 +112,6 @@ def parse_backer_page(backer_id, soup):
 	except:
 		logging.exception("Could not find backer 'bio' attr")
 		logging.exception(str(bio_div))
-		backer['bio'] = ''
 
 	return backer
 
@@ -132,7 +127,8 @@ def parse_project_page(project_id, soup):
 		A dictionary of project attributes
 	"""
 
-	project = { 'id': project_id }
+	project = defaults.PROJECT
+	project['id'] = project_id
 
 	name_h1 = soup.findAll('h1', {'id':'title'})[0]
 	project['name'] = name_h1.a.contents[0]
@@ -140,53 +136,47 @@ def parse_project_page(project_id, soup):
 	project['link'] = find_attr('href', name_h1.a.attrs)
 
 	author_a = soup.findAll('div', {'id':'creator-name'})
-	if author_a:
+	if not author_a:
+		logging.exception("Could not find project 'author' attr")
+	else:
 		try:
 			project['author'] = author_a[0].h3.a.contents[0]
 		except:
 			logging.exception("Could not find project 'author' attr")
 			logging.exception(str(author_a))
-			project['author'] = ''
 
 		try:
 			project['author_link'] = \
 						find_attr('href', author_a[0].h3.a.attrs)
 		except:
 			logging.exception("Could not find project 'author_link' attr")
-			project['author_link'] = ''
-	else:
-		project['author'] = ''
-		logging.exception("Could not find project 'author' attr")
+			logging.exception(str(author_a))
 	
 
 	try:
 		desc_p = soup.findAll('p', \
 					 {'class':'short-blurb'})[0].contents[0]
+		project['desc'] = desc_p
 	except Exception:
-		desc_p = ''
 		logging.exception("Could not find project 'desc' attr")
 
-	project['desc'] = desc_p
 
 	try:
 		desc_p_long = soup.findAll('div',\
 					 {'class':'full-description'})[0].p.contents[0]
+		project['desc_full'] = desc_p_long
 	except Exception:
-		desc_p_long = ''
 		logging.exception("Could not find project 'desc_full' attr")
-	project['desc_full'] = desc_p_long
 
 	try:
 		project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].replace('\n','')
 	except:
-		project['started'] = ''
 		logging.exception("Could not find project 'started' attr")
 
 	try:
 		project['end'] = soup.findAll('li', \
 					{'class':'ends'})[0].contents[2].replace('\n','')
 	except:
-		project['end'] = ''
 		logging.exception("Could not find project 'end' attr")
 
 	try:
@@ -202,14 +192,12 @@ def parse_project_page(project_id, soup):
 				project['video'] = \
 						find_attr('data-video', video_div[0].attrs)
 	except:
-		project['img'] = ''
 		logging.exception("Could not find project 'img' attr")
 
 	try:
 		loc_div = soup.findAll('li', {'class':'location'})[0]
 		project['loc'] = loc_div.a.contents[1].strip()
 	except:
-		project['loc'] = ''
 		logging.exception("Could not find project 'loc' attr")
 
 
