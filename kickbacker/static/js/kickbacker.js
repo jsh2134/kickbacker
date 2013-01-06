@@ -31,7 +31,6 @@ function get_backers(url, callback, err_callback) {
            'url': '/project/backers'
            });
   }
-
 function save_key(key, backer_id, project_id, url, kb_url, email, kb_type) {
     $.ajax({ 'type': 'POST',
            'async': false, 
@@ -49,7 +48,6 @@ function save_key(key, backer_id, project_id, url, kb_url, email, kb_type) {
            'url': '/key'
            });
   }
-
 function get_project_backers() {
     var url = $('#ks-url').val();
     get_backers(url, function(data) {
@@ -62,7 +60,6 @@ function get_project_backers() {
                   });
 
 }
-
 function get_backer_id(url) {
   var pattern = '/profile/([A-z0-9]*)/?';
   var matched = url.match(pattern);
@@ -72,7 +69,6 @@ function get_backer_id(url) {
     return false;
   }
 }
-
 function get_project_id(url) {
   var pattern = '/projects/([A-z0-9]*)/?';
   var matched = url.match(pattern);
@@ -122,7 +118,7 @@ function display_url() {
     var email = $('#ks-email').val();
     var kb_type = $('#kb-type').val();
 
-    //Strip Args from URLs
+    // Strip Args from URLs
     url = clean_url(url);
     profile = clean_url(profile);
 
@@ -133,12 +129,47 @@ function display_url() {
                 $('#button-div').toggle();
                 $('#your-link').toggle();
                 $('#your-link-area').val(data.awesm_url);
+
+                // create project
                 save_key(data.path, backer_id, project_id, url, kb_url, email, kb_type);
+                // search for prizes
+                // TODO move this action after popup of the modal
+                load_prizes(project_id);
               }, function(data) {
                   console.log(data);
                   $('#your-link').html("An Error has occurred when shortening your url: " + data.responseText);
                   });
    }
+
+function load_prizes(project_id) {
+   $.ajax({ 'type': 'GET',
+           'async': false, 
+           'datatype': 'json',
+           'url': '/project/'+project_id+'/prizes',
+           'success' : function(data) {
+                         if (data.success === true){
+                              console.log(data.prizes);
+                              var prize_data = new Array();
+                              $.each(data.prizes, function(){
+                                var pdict = {
+                                    id: this.id,
+                                    title: this.title,
+                                    desc: this.desc,
+                                      };
+                                prize_data.push(pdict);
+                                });
+                         $("#loading-li").toggle();
+                         $("#prizes-tmpl").tmpl(prize_data).appendTo("#ul-prizes");
+                         }
+                        else {
+                          setTimeout(function() { load_prizes(project_id); }, 2000);
+                         }
+           },
+           'error' : function(data) {
+                  setTimeout(function() { load_prizes(project_id); }, 2000);
+           }
+    });
+  }
 function is_valid_email() {
   var re = /\S+@\S+\.\S+/;
   return re.test($('#ks-email').val());

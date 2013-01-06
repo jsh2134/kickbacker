@@ -21,6 +21,7 @@ PROJECT = { 'author' : '',
 			'amount': '',
 			'end_time': '',
 			'hours_left': '',
+			'prizes': [],
 	
 }
 

@@ -19,9 +19,14 @@ def respond_show_backers(project_id):
 def respond_get_backers():
 	return views.get_project_backers()
 
+@app.route('/project/<project_id>/prizes')
+def respond_prizes(project_id):
+	return views.show_prizes(project_id)
+
 @app.route('/projects')
 def respond_projects():
 	return views.show_projects()
+
 
 @app.route('/key', methods=['POST'])
 def respond_add_key():

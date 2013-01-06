@@ -3,6 +3,7 @@ import json
 import re
 import time
 import logging
+import hashlib
 
 logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
 
@@ -19,7 +20,12 @@ BACKER_URL = KS_ROOT + '/profile/%s'
 
 def get_kickstarter_response(url, json_out=True):
 	logging.info("Hitting %s" % url)
-	result = urllib.urlopen(url)
+	try:
+		result = urllib.urlopen(url)
+	except IOError:
+		logging.info('IOError, trying twice more')
+		result = urllib.urlopen(url)
+
 	resp = result.read()
 	if json_out:
 		return json.loads(resp)
@@ -80,7 +86,6 @@ def parse_backer_page(backer_id, soup):
 	backer['id'] = backer_id
 	backer['url'] = BACKER_URL % (backer_id)
 			
-	logging.info(soup)
 	try:
 		img_div = soup.findAll("meta", {"property":"og:image"})
 		logging.info(img_div)
@@ -130,10 +135,27 @@ def parse_project_page(project_id, soup):
 	project = defaults.PROJECT
 	project['id'] = project_id
 
-	name_h1 = soup.findAll('h1', {'id':'title'})[0]
-	project['name'] = name_h1.a.contents[0]
-	project['title'] = name_h1.a.contents[0]
-	project['link'] = find_attr('href', name_h1.a.attrs)
+	try:
+		name_div = soup.findAll("meta", {"property":"og:title"})
+		project['name'] = find_attr('content', name_div[0].attrs)
+		project['title'] = find_attr('content', name_div[0].attrs)
+	except:
+		logging.exception("Could not find project 'name' and 'title' attr")
+		logging.exception(str(name_div))
+
+	try:
+		url_div = soup.findAll("meta", {"property":"og:url"})
+		project['link'] = find_attr('content', url_div[0].attrs)
+	except:
+		logging.exception("Could not find project 'url' attr")
+		logging.exception(str(url_div))
+
+	try:
+		desc_div = soup.findAll("meta", {"property":"og:description"})
+		project['desc'] = find_attr('content', desc_div[0].attrs)
+	except:
+		logging.exception("Could not find project 'desc' attr")
+		logging.exception(str(desc_div))
 
 	author_a = soup.findAll('div', {'id':'creator-name'})
 	if not author_a:
@@ -154,14 +176,6 @@ def parse_project_page(project_id, soup):
 	
 
 	try:
-		desc_p = soup.findAll('p', \
-					 {'class':'short-blurb'})[0].contents[0]
-		project['desc'] = desc_p
-	except Exception:
-		logging.exception("Could not find project 'desc' attr")
-
-
-	try:
 		desc_p_long = soup.findAll('div',\
 					 {'class':'full-description'})[0].p.contents[0]
 		project['desc_full'] = desc_p_long
@@ -169,13 +183,13 @@ def parse_project_page(project_id, soup):
 		logging.exception("Could not find project 'desc_full' attr")
 
 	try:
-		project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].replace('\n','')
+		project['started'] = soup.findAll('li', {'class':'posted'})[0].contents[2].strip('\n ')
 	except:
 		logging.exception("Could not find project 'started' attr")
 
 	try:
 		project['end'] = soup.findAll('li', \
-					{'class':'ends'})[0].contents[2].replace('\n','')
+					{'class':'ends'})[0].contents[2].strip('\n ')
 	except:
 		logging.exception("Could not find project 'end' attr")
 
@@ -213,7 +227,8 @@ def parse_project_page(project_id, soup):
 			project['pct-funded'] = \
 						find_attr('data-percent-raised', nd.attrs)
 
-		if 'pct-funded' in project:
+		logging.info('this is pct-funded %s' % project['pct-funded'])
+		if 'pct-funded' in project and project['pct-funded']:
 			if float(project['pct-funded']) < 1.0:
 				project['status'] = "Raising"
 				project['funded'] = False
@@ -234,7 +249,56 @@ def parse_project_page(project_id, soup):
 			project['hours_left'] = \
 						find_attr('data-hours_remaining', nd.attrs)
 
+
+	# Get Project Rewards (prizes)
+	prizes = []
+	logging.info('\n\nPrizes')
+	prize_ul = soup.findAll('ul', {'id':'what-you-get'})
+	prize_lis = prize_ul[0].findAll('li')
+	for li in prize_lis:
+		prize = {}
+		prize['title'] = li.h3.contents[0].strip()
+		prize['value'] = re.compile('.*\$(\d+).*').match(prize['title']).groups()[0]
+		prize['id'] = create_prize_id(project_id, prize['title'])
+
+		try:
+			prize['link'] = find_attr('href', li.attrs)
+		except:
+			logging.exception('Cant find link for this prize')
+		logging.info(prize)
+
+		try:
+			desc_div = li.findAll('div', {'class':'desc'})
+			desc_str = ""
+			for s in desc_div[0].contents:
+				desc_str += s.string.strip()
+			prize['desc'] = desc_str.strip()
+		except:
+			logging.exception('Cant find descrip for this prize')
+
+		try:
+			deliv_div = li.findAll('div', {'class':'delivery-date'})
+			prize['delivery-date'] = deliv_div[0].contents[0].strip("\n ")
+		except:
+			logging.exception('Cant find deliv_date for this prize')
+
+		# Append prize to list of prizes
+		prizes.append(prize)
+
+	if prizes:
+		project['prizes'] = prizes
+
 	return project
+
+
+def create_prize_id(project_id, name):
+	return hashlib.sha224(project_id + "kb" + name).hexdigest()[:8]
+	#prize_id = re.compile('.*backer_reward_id%5D=(\d+).*').match(url)
+	#if prize_id:
+	#	return prize_id.groups()[0]
+	#else:
+	#	logging.info('No backer_reward_id found in %s' % url)
+	#	return None
 
 
 def parse_project_results_json(js):
@@ -323,8 +387,23 @@ def parse_backers(backer_list, backer_dict):
 		logging.info(backer_dict[key])
 
 
-def get_project(project_url):
+def add_prizes(prizes, project_id):
+	""" Add prizes to a project """
+	for prize in prizes:
+		datalib.add_short_prize(app.rs, prize['id'])
+		datalib.add_project_prize(app.rs, project_id, prize['id'])
+		for key, value in prize.iteritems():
+			a = datalib.update_short_prize(app.rs, prize['id'], key, value)
+			logging.info('Prizes: %s %s: %s' % ("Added" if a else "Existed", key, value))
 
+	# Add some prize at the end
+	# signals that all prizes have been stored
+	datalib.add_project_backer_prize(app.rs, project_id, prize['id'])
+
+	return True
+
+
+def get_project(project_url):
 	logging.info("Parsing URL %s" % (project_url) )
 
 	resp = get_kickstarter_response(project_url, json_out=False)
@@ -333,14 +412,17 @@ def get_project(project_url):
 	project_id = get_project_id(project_url)
 	project_dict = parse_project_page(project_id, soup)
 	for key, value in project_dict.iteritems():
-		a = datalib.update_project(app.rs, project_id, key, value)
+		if key == 'prizes':
+			a = add_prizes(project_dict['prizes'], project_id)
+		else:	
+			a = datalib.update_project(app.rs, project_id, key, value)
+
 		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 	
 	return project_dict
 
 
 def get_backer(backer_url, backer_type):
-
 	logging.info("Parsing URL %s" % (backer_url) )
 
 	resp = get_kickstarter_response(backer_url, json_out=False)

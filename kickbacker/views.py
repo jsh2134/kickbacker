@@ -14,6 +14,7 @@ from kickbacker import rewards
 from kickbacker import kickstarter
 from kickbacker.celery_queue import tasks
 
+
 def make_timestamp(time_str, time_format="%Y-%m-%d %H:%M:%S.%f"):
 	return datetime.datetime.strptime(time_str, time_format)
 
@@ -47,6 +48,7 @@ def show_backers(project_id):
 								backer_list = backers,
 								project = project )
 
+
 def show_projects():
 	projects = {}
 	project_list = datalib.get_projects(app.rs)
@@ -55,11 +57,13 @@ def show_projects():
 	return render_template('show_projects.html',
 								projects = projects)
 
+
 def get_project_backers():
 	project_url = request.form.get('url')
 	project_id, project_backers = kickstarter.get_backers(app.rs, project_url)
 	if project_id:
 		return jsonify({'id':project_id, 'backers':project_backers})
+
 
 def key_redirect(project_id, backer_id):
 	""" Lookups proper redirect, logs clicks, sets cookie """
@@ -109,16 +113,41 @@ def new_short_key():
 									% (key, backer_id, project_id)})
 
 
+def show_prizes(project_id):
+
+	prizes_added = datalib.get_project_backer_prize(app.rs, project_id)
+	if prizes_added:
+		prizes = {}
+		prize_ids = datalib.get_project_prizes(app.rs, project_id)
+		for prize_id in prize_ids:
+			prizes[prize_id] = datalib.get_short_prize(app.rs, prize_id)
+		
+		if prizes:
+			sorted_prizes = prizes.keys()
+			sorted_prizes.sort(lambda y,x : cmp(
+												int(prizes[x]['value']),
+												int(prizes[y]['value'])
+											))
+			pl = []
+			for prize in sorted_prizes:
+				pl.append( prizes[prize] )
+			return jsonify({'success': True, 'prizes' :pl})
+		else:
+			return jsonify({'success': False, 'message':'No prizes found'})
+	else:
+		return jsonify({'success': False, 'message':'Prizes not added yet'})
+
+
 def create_new_project(backer_id, project_id, key, \
 						kb_url, url, email, kb_type):
-
-	# Queue up backer scrape job
-	if datalib.add_backer(app.rs, backer_id):
-		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id), kb_type)
 
 	# Queue up project scrape job
 	if datalib.add_project(app.rs, project_id):
 		tasks.harvest_project.delay(url)
+
+	# Queue up backer scrape job
+	if datalib.add_backer(app.rs, backer_id):
+		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id), kb_type)
 
 	datalib.add_kickbacker(app.rs, email)
 	datalib.update_kickbacker(app.rs, email, 'project', project_id)

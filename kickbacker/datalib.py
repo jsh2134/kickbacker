@@ -62,6 +62,23 @@ def get_project_short_keys(rs, project_id):
 	""" Return project shortened urls """
 	return rs.smembers('project:%s:keys' % (project_id))
 
+def add_project_prize(rs, project_id, prize):
+	""" Add a prize to a project"""
+	return rs.sadd('project:%s:prizes' % (project_id), prize)
+
+def get_project_prizes(rs, project_id):
+	""" Return project shortened urls """
+	return rs.smembers('project:%s:prizes' % (project_id))
+
+def add_project_backer_prize(rs, project_id, prize):
+	""" Add a prize to a project"""
+	return rs.sadd('project:%s:backer_prize' % (project_id), prize)
+
+def get_project_backer_prize(rs, project_id):
+	""" Return project shortened urls """
+	return rs.smembers('project:%s:backer_prize' % (project_id))
+
+
 #################
 # Backer Methods
 #################
@@ -149,4 +166,26 @@ def incr_rewards(rs, key, reward, inc=1):
 
 def get_rewards(rs, key):
 	return rs.hgetall('key:%s:rewards' % key)
+
+#################################
+# Prize (Backer Rewards) Methods
+##################################
+
+# Prizes - prize
+def add_short_prize(rs, prize_id):
+	""" Add Prize """
+	return rs.sadd('prize', prize_id)
+
+def get_short_prizes(rs):
+	""" Return List of Prizes"""
+	return rs.smembers('prize')
+
+# Prize - prize:<id>
+def update_short_prize(rs, prize_id, key, val):
+	""" Update Prize metadata """
+	return rs.hset('prize:%s' % prize_id, key, val)
+
+def get_short_prize(rs, prize_id):
+	""" Return Prize Metadata """
+	return rs.hgetall('prize:%s' % prize_id)
 

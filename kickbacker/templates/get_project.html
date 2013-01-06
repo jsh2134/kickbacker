@@ -3,6 +3,8 @@
  <script type='text/javascript' src='/static/js/kickbacker.js'></script>
  <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
  <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
+ <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
+ <script type='text/javascript' src='/static/js/jquery.tmpl.min.js'></script>
 
  <script type='text/javascript'>
 $(function () {
@@ -92,40 +94,29 @@ $(function () {
       {% else %}
         <input id="kb-type" name="kb-type" type="hidden" value="owner">
         <div class="control-group">
-          <label class="control-label">Kickstarter Project URL: 
+          <label class="control-label">Kickstarter Project Link: 
             <span class='help-inline'>
-              <a style='font-size:10px;' id='ks-url-help' rel='popover' href='#' data-original-title='Kickstarter Project URL' data-content='Enter the URL of the project you wish to promote. You can get the kickstarter project URL by going to the Kickstarter page for that project, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/projects/project-shortname-or-id/full-project-name</b>'>What is this?</a>
+              <a style='font-size:10px;' id='ks-url-help' rel='popover' href='#' data-original-title='Kickstarter Project Link' data-content='Enter the Link of the project you wish to promote. You can get the kickstarter project Link by going to the Kickstarter page for that project, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/projects/project-shortname-or-id/full-project-name</b>'>What is this?</a>
             </span>
           </label>
           <div class="controls">
-            <input id="ks-url" name="url" type="text" class='input-xlarge' placeholder='http://kickstarter.com/projects/1418932/the-five-points'>
+            <input id="ks-url" name="url" type="text" class='input-xlarge' value='http://kickstarter.com/projects/1418932/the-five-points'>
           </div>
         </div>
       {% endif %}
       <!-- Begin Backer Info -->
       <div class="control-group">
-        <label class="control-label">Kickstarter Profile URL:
+        <label class="control-label">Kickstarter Profile Link:
             <span class='help-inline'>
-              <a style='font-size:10px;' id='ks-profile-help' rel='popover' href='#' data-original-title='Kickstarter Profile URL' data-content='You can get your kickstarter profile URL by logging into Kickstarter, going to your profile page, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/profile/your-name-or-id</b>'>What is this?</a>
+              <a style='font-size:10px;' id='ks-profile-help' rel='popover' href='#' data-original-title='Kickstarter Profile Link' data-content='You can get your kickstarter profile link by logging into Kickstarter, going to your profile page, and copy and pasting the link here. <br><br> It will look like this: <b>http://kickstarter.com/profile/your-name-or-id</b>'>What is this?</a>
             </span>
           </label>
         <div class="controls">
-          <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' placeholder="http://kickstarter.com/profile/bill-the-butcher">
+          <input id="ks-profile" name="ks-profile" type="text" class='input-xlarge' value="http://www.kickstarter.com/profile/1263719778">
         </div>
       </div>
-      <div id='your-link'>
-        <textarea id='your-link-area' class='input-xlarge'>
-        </textarea>
-        <span class='help-inline'>
-          {% if lead_type == 'backer' %}
-            Copy Your Link and Go!
-          {% else %}
-            Copy Your Link, Share with your Backers and Go!
-          {% endif %}
-        </span>
-      </div>
       <div id="button-div">
-        <button id='go' type="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
+        <button href='#myModal' data-toggle="modal" role="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
           {% if lead_type == 'backer' %}
             Start Earning Kickbacks!
           {% else %}
@@ -137,6 +128,42 @@ $(function () {
   </form>
 </div>
 
+
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Welcome to KickBacker!</h3>
+  </div>
+  <div class="modal-body">
+
+  <ul id='ul-prizes' class="inline">
+   <li id='loading-li'>Loading Backer Rewards Now</li>
+    <!--jquery Template-->
+    <script id="prizes-tmpl" type="text/x-jQuery-tmpl">
+        <li id="prize-${id}">
+           ${desc} <br> <b>(${title})</b>
+        </li>
+    </script>
+  </ul>
+
+      <div id='your-link'>
+        <textarea id='your-link-area' class='input-xlarge'>
+        </textarea>
+        <span class='help-inline'>
+          {% if lead_type == 'backer' %}
+            Copy Your Link and Go!
+          {% else %}
+            Copy Your Link, Share with your Backers and Go!
+          {% endif %}
+        </span>
+      </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary">Save changes</button>
+  </div>
+</div>
 
 
 {% endblock content %}
