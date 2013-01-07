@@ -111,7 +111,7 @@ function is_valid_kickstarter_url(url, url_type) {
   return true;
 }
 
-function display_url() {
+function create_project() {
     $('#go').attr('disabled', 'disabled');
     var url = $('#ks-url').val();
     var profile = $('#ks-profile').val();
@@ -125,6 +125,7 @@ function display_url() {
     var backer_id = get_backer_id(profile);
     var project_id = get_project_id(url);
     var kb_url = build_kb_url(project_id, backer_id, kb_type);
+    console.log(kb_url)
     get_awesm_url(kb_url, function(data) {
                 $('#button-div').toggle();
                 $('#your-link').toggle();
@@ -132,14 +133,17 @@ function display_url() {
 
                 // create project
                 save_key(data.path, backer_id, project_id, url, kb_url, email, kb_type);
-                // search for prizes
-                // TODO move this action after popup of the modal
-                load_prizes(project_id);
               }, function(data) {
                   console.log(data);
                   $('#your-link').html("An Error has occurred when shortening your url: " + data.responseText);
                   });
-   }
+  if (kb_type == 'backer') {
+     $('#myModal').modal('show');
+  }
+  else {
+     window.location = "/project/"+project_id+"/edit/";
+  }
+ }
 
 function load_prizes(project_id) {
    $.ajax({ 'type': 'GET',
@@ -148,18 +152,23 @@ function load_prizes(project_id) {
            'url': '/project/'+project_id+'/prizes',
            'success' : function(data) {
                          if (data.success === true){
-                              console.log(data.prizes);
                               var prize_data = new Array();
                               $.each(data.prizes, function(){
+                                var shortened_desc = shorten(this.desc, 300);
                                 var pdict = {
                                     id: this.id,
                                     title: this.title,
                                     desc: this.desc,
+                                    value: this.value,
+                                    shortdesc: shortened_desc,
                                       };
                                 prize_data.push(pdict);
                                 });
                          $("#loading-li").toggle();
-                         $("#prizes-tmpl").tmpl(prize_data).appendTo("#ul-prizes");
+                         $("#prizes-tmpl").tmpl(prize_data).appendTo("#tbl-prizes");
+                          $.each(data.prizes, function(){
+                              $('#prize-desc-'+this.id).popover();
+                            });
                          }
                         else {
                           setTimeout(function() { load_prizes(project_id); }, 2000);
@@ -170,6 +179,9 @@ function load_prizes(project_id) {
            }
     });
   }
+function shorten(some_text, some_len) {
+    return some_text.slice(0,some_len) + "..."
+};
 function is_valid_email() {
   var re = /\S+@\S+\.\S+/;
   return re.test($('#ks-email').val());

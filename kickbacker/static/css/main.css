@@ -56,9 +56,9 @@ img {
 }
 .project-leaderboard-kickback {
 	float:right;
-	width:300px;
+	width:400px;
 }
-.reward-text {
+.prize-text {
 	font-size:16px;
 }	
 
@@ -151,3 +151,9 @@ img.thumb {
 	width:240px;
 	padding:5px 0px 5px 20px;
 }
+.prizes {
+	list-style-type: none;
+}
+
+
+

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from flask import render_template
 from flask import request
@@ -14,6 +15,7 @@ from kickbacker import rewards
 from kickbacker import kickstarter
 from kickbacker.celery_queue import tasks
 
+logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
 
 def make_timestamp(time_str, time_format="%Y-%m-%d %H:%M:%S.%f"):
 	return datetime.datetime.strptime(time_str, time_format)
@@ -58,6 +60,19 @@ def show_projects():
 								projects = projects)
 
 
+def edit_project(project_id):
+	project = datalib.get_project(app.rs, project_id)
+	project['id'] = project_id 
+	return render_template('edit_project.html', 
+	 					project=project,
+						)
+
+
+def save_project(project_id, prize_id):
+	a = datalib.update_project(app.rs, project_id, 'backer_prize',  prize_id)
+	return jsonify({'success': a})
+
+
 def get_project_backers():
 	project_url = request.form.get('url')
 	project_id, project_backers = kickstarter.get_backers(app.rs, project_url)
@@ -67,6 +82,7 @@ def get_project_backers():
 
 def key_redirect(project_id, backer_id):
 	""" Lookups proper redirect, logs clicks, sets cookie """
+
 	raw_key = request.values.get('awesm')
 	key = raw_key.split('_')[1]
 	redirect_url = datalib.get_redirect(app.rs, key)
@@ -115,16 +131,16 @@ def new_short_key():
 
 def show_prizes(project_id):
 
-	prizes_added = datalib.get_project_backer_prize(app.rs, project_id)
+	prizes_added = datalib.get_project_prizes(app.rs, project_id)
 	if prizes_added:
 		prizes = {}
 		prize_ids = datalib.get_project_prizes(app.rs, project_id)
 		for prize_id in prize_ids:
-			prizes[prize_id] = datalib.get_short_prize(app.rs, prize_id)
+			prizes[prize_id] = datalib.get_prize(app.rs, prize_id)
 		
 		if prizes:
 			sorted_prizes = prizes.keys()
-			sorted_prizes.sort(lambda y,x : cmp(
+			sorted_prizes.sort(lambda x,y : cmp(
 												int(prizes[x]['value']),
 												int(prizes[y]['value'])
 											))
@@ -222,6 +238,8 @@ def leaderboard(project_id):
 										nf_type = "project",
 										nf_id = project_id)
 	else:
+		project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		project['backer_prize'] = project_prize
 		project_backers = datalib.get_project_backers(app.rs, project_id)
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 

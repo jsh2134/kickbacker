@@ -4,7 +4,6 @@
  <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
  <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
  <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
- <script type='text/javascript' src='/static/js/jquery.tmpl.min.js'></script>
 
  <script type='text/javascript'>
 $(function () {
@@ -90,7 +89,7 @@ $(function () {
       <!-- Begin Project Info -->
       {% if lead_type == 'backer' %}
         <input id="kb-type" name="kb-type" type="hidden" value="backer">
-        <input id="ks-url" name="url" type="hidden" value="{{ project['url'] }}">
+        <input id="ks-url" name="url" type="hidden" value="{{ project.link }}">
       {% else %}
         <input id="kb-type" name="kb-type" type="hidden" value="owner">
         <div class="control-group">
@@ -116,7 +115,7 @@ $(function () {
         </div>
       </div>
       <div id="button-div">
-        <button href='#myModal' data-toggle="modal" role="button" onclick='display_url()' class="btn btn-primary" style='float:right;'>
+        <button onclick='create_project()' class="btn btn-primary" type="button" style='float:right;'>
           {% if lead_type == 'backer' %}
             Start Earning Kickbacks!
           {% else %}
@@ -128,40 +127,27 @@ $(function () {
   </form>
 </div>
 
-
-<!-- Modal -->
+<!-- Backer Signup Modal -->
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel">Welcome to KickBacker!</h3>
+    <h3 id="myModalLabel">Share this link with your Network!</h3>
   </div>
   <div class="modal-body">
-
-  <ul id='ul-prizes' class="inline">
-   <li id='loading-li'>Loading Backer Rewards Now</li>
-    <!--jquery Template-->
-    <script id="prizes-tmpl" type="text/x-jQuery-tmpl">
-        <li id="prize-${id}">
-           ${desc} <br> <b>(${title})</b>
-        </li>
-    </script>
-  </ul>
-
-      <div id='your-link'>
-        <textarea id='your-link-area' class='input-xlarge'>
-        </textarea>
-        <span class='help-inline'>
-          {% if lead_type == 'backer' %}
-            Copy Your Link and Go!
-          {% else %}
-            Copy Your Link, Share with your Backers and Go!
-          {% endif %}
-        </span>
-      </div>
+    <div id='your-link'>
+      <textarea id='your-link-area' class='input-xlarge'>
+      </textarea>
+      <span class='help-inline'>
+        {% if lead_type == 'backer' %}
+          Copy Your Link and Go!
+        {% else %}
+          Copy Your Link, Share with your Backers and Go!
+        {% endif %}
+      </span>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    <button class="btn btn-primary">Save changes</button>
   </div>
 </div>
 

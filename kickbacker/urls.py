@@ -1,5 +1,6 @@
 from kickbacker import app
 from kickbacker import views
+from flask import request
 
 @app.route('/')
 @app.route('/new/')
@@ -23,10 +24,17 @@ def respond_get_backers():
 def respond_prizes(project_id):
 	return views.show_prizes(project_id)
 
+@app.route('/project/<project_id>/edit/')
+def respond_project_edit(project_id):
+	return views.edit_project(project_id)
+
+@app.route('/project/<project_id>/save/', methods=['POST'])
+def respond_project_save(project_id):
+	return views.save_project(project_id, request.form['kickback_id'])
+
 @app.route('/projects')
 def respond_projects():
 	return views.show_projects()
-
 
 @app.route('/key', methods=['POST'])
 def respond_add_key():

@@ -258,7 +258,8 @@ def parse_project_page(project_id, soup):
 	for li in prize_lis:
 		prize = {}
 		prize['title'] = li.h3.contents[0].strip()
-		prize['value'] = re.compile('.*\$(\d+).*').match(prize['title']).groups()[0]
+		# strip commas and match digits
+		prize['value'] = re.compile('.*\$(\d+).*').match(prize['title'].replace(',','')).groups()[0]
 		prize['id'] = create_prize_id(project_id, prize['title'])
 
 		try:
@@ -390,15 +391,15 @@ def parse_backers(backer_list, backer_dict):
 def add_prizes(prizes, project_id):
 	""" Add prizes to a project """
 	for prize in prizes:
-		datalib.add_short_prize(app.rs, prize['id'])
+		datalib.add_prize(app.rs, prize['id'])
 		datalib.add_project_prize(app.rs, project_id, prize['id'])
 		for key, value in prize.iteritems():
-			a = datalib.update_short_prize(app.rs, prize['id'], key, value)
+			a = datalib.update_prize(app.rs, prize['id'], key, value)
 			logging.info('Prizes: %s %s: %s' % ("Added" if a else "Existed", key, value))
 
 	# Add some prize at the end
 	# signals that all prizes have been stored
-	datalib.add_project_backer_prize(app.rs, project_id, prize['id'])
+	datalib.update_project(app.rs, project_id, 'backer_prize', prize['id'])
 
 	return True
 
