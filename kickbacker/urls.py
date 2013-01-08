@@ -56,3 +56,7 @@ def respond_projectboard():
 def respond_leaderboard(project_id):
 	return views.leaderboard(project_id)
 
+@app.route('/contact')
+def respond_contact():
+	return views.respond_contact()
+

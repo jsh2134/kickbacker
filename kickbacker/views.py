@@ -26,10 +26,15 @@ def respond_index(project_id):
 	# Redirect to backer focused page
 	if project_id:
 		lead_type = 'backer'
+		project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		project['backer_prize'] = project_prize
 	else:
 		lead_type = 'owner'
 	return render_template('index.html', project=project,
 										 lead_type=lead_type)
+
+def respond_contact():
+	return render_template('contact.html')
 
 
 def show_backer(backer):
