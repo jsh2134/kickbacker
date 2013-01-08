@@ -127,6 +127,9 @@ def install_web():
 	sudo('mkdir /var/log/supervisord/')
 	sudo('chown kickbacker:kickbacker /var/log/supervisord')
 	put('supervisord.conf', '%s/etc/supervisord.conf' % venv, use_sudo=True)
+	put('supervisord.init', '/etc/rc.d/init.d/supervisord' % venv, use_sudo=True)
+	sudo('chkconfig --add supervisord')
+	sudo('chmod +x /etc/init.d/supervisord')
 
 	# Update python encoding
 	pyv = run("""python -c 'import sys; print "%s.%s" % (sys.version_info[0], sys.version_info[1])'""")
@@ -156,6 +159,8 @@ def start_app():
 	# start supervisor
 	virtualenv('supervisord')
 
+def restart_supervisord():
+	sudo('service supervisord restart')
 
 def restart_app():
 	virtualenv('supervisorctl restart celery kickbacker')
@@ -186,6 +191,10 @@ def install_redis():
 
 	put('redis/redis.conf', '/etc/redis/redis.conf', use_sudo=True)
 	put('redis/redis.init', '/etc/rc.d/init.d/redis', use_sudo=True, mode=751)
+
+	# Create Dump File
+	#TODO verify this actually works
+	sudo('touch /etc/redis/dump.rdb', use_sudo=True, mode=755)
 
 	sudo('wget http://download.redis.io/redis-stable.tar.gz', pty=True)
 	sudo('tar xvzf redis-stable.tar.gz', pty=True)
