@@ -83,8 +83,12 @@ def get_project_backers():
 def key_redirect(project_id, backer_id):
 	""" Lookups proper redirect, logs clicks, sets cookie """
 
-	raw_key = request.values.get('awesm')
-	key = raw_key.split('_')[1]
+	# Expensive
+	project_keys = set(datalib.get_project_short_keys(app.rs, project_id))
+	backer_keys = set(datalib.get_backer_short_keys(app.rs, backer_id))
+
+	key = list(project_keys & backer_keys)[0]
+	print 'found key: %s' % key
 	redirect_url = datalib.get_redirect(app.rs, key)
 
 	redirect_url = '%s?ref=kickbacker' % (redirect_url)
@@ -96,8 +100,9 @@ def key_redirect(project_id, backer_id):
 	datalib.increment_project_value(app.rs, project_id, 'clicks')
 
 	# Store Referral URL (for now)
-	datalib.add_short_key_referrer(app.rs, key, request.referrer)
-	rewards.check_for_rewards(key, request.referrer)
+	if request.referrer:
+		datalib.add_short_key_referrer(app.rs, key, request.referrer)
+		rewards.check_for_rewards(key, request.referrer)
 
 	# Set Redirect URL
 	resp = make_response( redirect(redirect_url) )
