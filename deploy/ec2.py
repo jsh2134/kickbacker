@@ -36,6 +36,9 @@ class EC2Conn:
 		
 		print "instance %s done!" % (instance.id)
 
+		# Sleep for a bit more before trying to connect
+		time.sleep(60)
+
 		if address:	
 			success = self.link_instance_and_ip(instance.id, address)
 			if success:

@@ -10,8 +10,8 @@
 
 name="redis-server"
 exec="/usr/local/bin/$name"
-pidfile="/var/run/redis/redis.pid"
-REDIS_CONFIG="/etc/redis/redis.conf"
+pidfile="/var/run/redis_6379.pid"
+REDIS_CONFIG="/etc/redis/6379.conf"
 
 [ -e /etc/sysconfig/redis ] && . /etc/sysconfig/redis
 

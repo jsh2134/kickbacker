@@ -127,7 +127,7 @@ def install_web():
 	sudo('mkdir /var/log/supervisord/')
 	sudo('chown kickbacker:kickbacker /var/log/supervisord')
 	put('supervisord.conf', '%s/etc/supervisord.conf' % venv, use_sudo=True)
-	put('supervisord.init', '/etc/rc.d/init.d/supervisord' % venv, use_sudo=True)
+	put('supervisord.init', '/etc/rc.d/init.d/supervisord', use_sudo=True)
 	sudo('chkconfig --add supervisord')
 	sudo('chmod +x /etc/init.d/supervisord')
 
@@ -181,20 +181,16 @@ def update_code():
 
 def install_redis():
 
-	with settings(warn_only=True):
-		sudo('useradd redis', pty=True)
-		sudo('mkdir %s' % os.path.join(os.path.sep, 'var','run','redis'), pty=True)
-		sudo('mkdir %s' % os.path.join(os.path.sep, 'var','lib','redis'), pty=True)
-		sudo('mkdir %s' % os.path.join(os.path.sep, 'var','log','redis'), pty=True)
-		sudo('mkdir %s' % os.path.join(os.path.sep, 'etc','redis'), pty=True)
-		sudo('chown redis:redis /var/log/redis /var/lib/redis /var/run/redis')
+	sudo('useradd redis', pty=True)
+	sudo('mkdir /etc/redis', pty=True)
+	sudo('mkdir /var/redis', pty=True)
+	sudo('mkdir /var/redis/6379', pty=True)
+	sudo('touch /var/log/redis_6379.log', pty=True)
+	sudo('chmod 0777 /var/log/redis_6379.log', pty=True)
+	put('redis/redis.conf', '/etc/redis/6379.conf', use_sudo=True)
 
-	put('redis/redis.conf', '/etc/redis/redis.conf', use_sudo=True)
-	put('redis/redis.init', '/etc/rc.d/init.d/redis', use_sudo=True, mode=751)
-
-	# Create Dump File
-	#TODO verify this actually works
-	sudo('touch /etc/redis/dump.rdb', use_sudo=True, mode=755)
+	put('redis/redis.init', '/etc/rc.d/init.d/redis_6379', use_sudo=True, mode=751)
+	sudo('chkconfig --add redis_6379', pty=True)
 
 	sudo('wget http://download.redis.io/redis-stable.tar.gz', pty=True)
 	sudo('tar xvzf redis-stable.tar.gz', pty=True)
@@ -204,7 +200,20 @@ def install_redis():
 		sudo('cp src/redis-server /usr/local/bin/')
 		sudo('cp src/redis-cli /usr/local/bin/')
 
-	sudo('service redis start', pty=True)
+	sudo('service redis_6379 start', pty=True)
 
+def debug_redis():
 
+	"""with settings(warn_only=True):
+		sudo('mkdir /etc/redis')
+		sudo('mkdir /var/redis')
+		sudo('mkdir /var/redis/6379')
+		sudo('mv /etc/rc.d/init.d/redis /etc/rc.d/init.d/redis_6379')
+		put('redis/redis.conf', '/etc/redis/6379.conf', use_sudo=True)
+		sudo('chkconfig --add redis_6379')
+		sudo('touch /var/log/redis_6379.log')
+		sudo('chmod 0777 /var/log/redis_6379.log')
+	"""
+	sudo('service redis_6379 restart', pty=True)
+	pyv = run("""sudo /home/kickbacker/kickbacker-env/bin/python -c 'import redis; r = redis.Redis("localhost");r.sadd("jeff",1);'""")
 
