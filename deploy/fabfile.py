@@ -183,8 +183,12 @@ def install_redis():
 
 	sudo('useradd redis', pty=True)
 	sudo('mkdir /etc/redis', pty=True)
+
 	sudo('mkdir /var/redis', pty=True)
 	sudo('mkdir /var/redis/6379', pty=True)
+	sudo('chown redis:redis /var/redis/6379', pty=True)
+	sudo('chown redis:redis /var/redis', pty=True)
+
 	sudo('touch /var/log/redis_6379.log', pty=True)
 	sudo('chmod 0777 /var/log/redis_6379.log', pty=True)
 	put('redis/redis.conf', '/etc/redis/6379.conf', use_sudo=True)
@@ -204,16 +208,9 @@ def install_redis():
 
 def debug_redis():
 
-	"""with settings(warn_only=True):
-		sudo('mkdir /etc/redis')
-		sudo('mkdir /var/redis')
-		sudo('mkdir /var/redis/6379')
-		sudo('mv /etc/rc.d/init.d/redis /etc/rc.d/init.d/redis_6379')
-		put('redis/redis.conf', '/etc/redis/6379.conf', use_sudo=True)
-		sudo('chkconfig --add redis_6379')
-		sudo('touch /var/log/redis_6379.log')
-		sudo('chmod 0777 /var/log/redis_6379.log')
-	"""
 	sudo('service redis_6379 restart', pty=True)
 	pyv = run("""sudo /home/kickbacker/kickbacker-env/bin/python -c 'import redis; r = redis.Redis("localhost");r.sadd("jeff",1);'""")
+
+#def wipe_redis_db():
+	
 
