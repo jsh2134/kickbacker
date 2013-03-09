@@ -52,9 +52,9 @@ def respond_dashboard():
 def respond_projectboard():
 	return views.projectboard()
 
-@app.route('/<project_id>/leaderboard')
+@app.route('/<project_id>/leaderboard', methods=['GET'])
 def respond_leaderboard(project_id):
-	return views.leaderboard(project_id)
+	return views.leaderboard(project_id, request.values.get('first'))
 
 @app.route('/contact')
 def respond_contact():

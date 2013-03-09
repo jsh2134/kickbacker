@@ -26,7 +26,11 @@ def respond_index(project_id):
 	# Redirect to backer focused page
 	if project_id:
 		lead_type = 'backer'
-		project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		#TODO
+		try:
+			project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		except:
+			project_prize = 'No Prize to see here Big Guy'
 		project['backer_prize'] = project_prize
 	else:
 		lead_type = 'owner'
@@ -186,11 +190,13 @@ def create_new_project(backer_id, project_id, key, \
 	datalib.add_redirect(app.rs, key, url)
 	datalib.update_short_key(app.rs, key, 'clicks', 0)
 	datalib.update_short_key(app.rs, key, 'url', url)
+	datalib.update_short_key(app.rs, key, 'kb_url', kb_url)
 	datalib.update_short_key(app.rs, key, 'created', \
 										datetime.datetime.now())
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
 	datalib.update_short_key(app.rs, key, 'backer_id', backer_id)
 	datalib.update_short_key(app.rs, key, 'backer_type',  kb_type)
+
 
 def projectboard():
 	""" Display stats about all projects"""	
@@ -239,7 +245,7 @@ def dashboard():
 								projects = project_dict,
 								total_clicks = total_clicks)
 
-def leaderboard(project_id):
+def leaderboard(project_id, share_info=None):
 	""" Display project stats """
 	project = datalib.get_project(app.rs, project_id)
 
@@ -248,8 +254,13 @@ def leaderboard(project_id):
 										nf_type = "project",
 										nf_id = project_id)
 	else:
-		project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		#TODO
+		try:
+			project_prize = datalib.get_prize(app.rs, project['backer_prize'])
+		except:
+			project_prize = "No Prize Here Bro"
 		project['backer_prize'] = project_prize
+
 		project_backers = datalib.get_project_backers(app.rs, project_id)
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 
@@ -281,8 +292,12 @@ def leaderboard(project_id):
 								int(backer_dict[x]['key']['clicks'])
 								)
 							)
+
+		kb_base_short = app.config['KB_BASE_SHORT']	
 		return render_template('show_leaderboard.html',
 									project = project,
 									backers = backer_dict,
 									sorted_backers = sorted_backers,
-									total_clicks = total_clicks)
+									total_clicks = total_clicks,
+									share_info = share_info,
+									kb_base_short = kb_base_short )

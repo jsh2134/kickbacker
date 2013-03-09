@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 
 {% block header %}
- <script type='text/javascript'>
- function toggle_div(divid) {
-    $(divid).toggle();
- }
- </script>
-{% endblock%}
+
+  {% if share_info %}
+    <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
+    <script type='text/javascript'>
+     $('#myModal').modal('show');
+    </script>
+  {% endif %}
+
+{% endblock header %}
 
 {% block content %}
 
@@ -65,20 +68,20 @@
             <i class="icon-globe"></i> {{ backers[backer].location }}
             <br>
           {% endif %}
-          <i class="icon-user"></i> Since {{ backers[backer]['key']['created'].strftime('%B %d') }}
+          <i class="icon-user"></i> Since {{ backers[backer].key.created.strftime('%B %d') }}
         </div>
         <div class="backer-stats">
          <h1>
-             {{ backers[backer]['key']['clicks'] }} Clicks
+             {{ backers[backer].key.clicks }} Clicks
          </h1>
-             <a target='_blank' href="http://demo.awe.sm/{{ backers[backer]['key']['id'] }}">http://demo.awe.sm/{{ backers[backer]['key']['id'] }}</a>
+             <a target='_blank' href="{{kb_base_short}}{{ backers[backer].key.id }}">{{kb_base_short}}{{ backers[backer].key.id }}</a>
         </div>
         <div class="backer-badges">
          <h1>
-             {{ backers[backer]['key']['rewards']|length }} Rewards
+             {{ backers[backer].key.rewards|length }} Rewards
          </h1>
-             {% if backers[backer]['key']['rewards']|length > 0 %}
-              {% for reward in backers[backer]['key']['rewards'] %}
+             {% if backers[backer].key.rewards|length > 0 %}
+              {% for reward in backers[backer].key.rewards %}
                 <i class="icon-bookmark"></i> {{ reward }} <br>
               {% endfor %}
              {% endif %}
@@ -86,6 +89,29 @@
       </div>
     </div>
   {% endfor %}
+</div>
+
+
+<!-- Project Create Info Modal -->
+<!-- Called when share_info is True -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Share this link with your Network!</h3>
+  </div>
+  <div class="modal-body">
+    <div id='your-link'>
+      <textarea id='your-link-area' class='input-xlarge'>
+        {{ project.kb_url }}
+      </textarea>
+      <span class='help-inline'>
+          Copy Your Link, Share with your Backers and Go!
+      </span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
 </div>
 
 {% endblock content %}

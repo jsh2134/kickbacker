@@ -164,7 +164,9 @@ function load_prizes(project_id) {
                                       };
                                 prize_data.push(pdict);
                                 });
-                         $("#loading-li").toggle();
+                         $("#loading-div").toggle();
+                         $("#reward-title").toggle();
+                         $("#reward-select").toggle();
                          $("#prizes-tmpl").tmpl(prize_data).appendTo("#tbl-prizes");
                           $.each(data.prizes, function(){
                               $('#prize-desc-'+this.id).popover();

@@ -23,7 +23,7 @@
         else {
             $.ajax({ 'type': 'POST',
                    'async': false, 
-                   'success': function () { window.location = '/'+project_id+'/leaderboard';},
+                   'success': function () { window.location = '/'+project_id+'/leaderboard?first=1';},
                    'cache': false,
                    'datatype': 'json',
                    'data': {
@@ -52,14 +52,14 @@ table-striped tbody tr.highlight td { background-color: red; }
 
   <div class="row">
     <div class="span7 well">
-    
-      <div style="margin-bottom:15px;">
+
+     <div id='loading-div' style='align:center;margin:20px;'> 
+       <h3> <img src='/static/img/spinner.gif'> Loading Backer Rewards from Kickstarter</h3>
+    </div>
+    <div id='reward-title' style="margin-bottom:15px;display:none;">
          <h3>Select a KickBack to give to your Backers</h3>
-      </div>
+    </div>
   <table id='tbl-prizes' class="table table-striped table-bordered">
-   <!-- <li id='loading-li' style='align-center'> 
-      <img src='/static/img/spinner.gif'> Loading Backer Rewards from Kickstarter
-    </li> -->
     <!--jquery Template-->
     <script id="prizes-tmpl" type="text/x-jQuery-tmpl">
         <tr id="prize-${id}">
@@ -87,7 +87,7 @@ table-striped tbody tr.highlight td { background-color: red; }
           {% endif %}
         </span>
       </div>
-    <button style='float:right' onclick='save_kickback()' class="btn btn-primary">Select Kickback</button>
+    <button id='reward-select' style='float:right;display:none;' onclick='save_kickback()' class="btn btn-primary">Select Kickback</button>
   </div>
  </div>
 {% endblock content %}
