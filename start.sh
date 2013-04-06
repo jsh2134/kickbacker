@@ -1,4 +1,3 @@
-sudo service mysqld start
 sudo service redis start
 ps -ef | grep handler.py | awk '{print $2}' | xargs kill
 python handler.py &
