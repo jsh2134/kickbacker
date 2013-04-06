@@ -18,16 +18,16 @@
 <div id='project-{{project.id}}' class='project-leaderboard'>
     <div class='project-leaderboard-container well' >
       <div class='project-leaderboard-desc'>
-        <a href="http://kickstarter.com/{{project.link}}">
+        <a target="_blank" href="http://kickstarter.com/{{project.link}}">
           <img src='{{project.img}}' width='150px' class='thumb'>
         </a>
         <h1>Kickbacker Leaderboard</h1>
         <div class="caption">
-          <a href="http://kickstarter.com/{{project.link}}">
+          <a target="_blank" href="http://kickstarter.com/{{project.link}}">
             <span class='project-title'>{{ project.name }}</span>
           </a>
           <p>
-            <span class='project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+            <span class='project-author'>by <a target="_blank" href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
             <br><br>
             <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
             &nbsp;&nbsp;
@@ -42,7 +42,7 @@
           <b>(A ${{project.backer_prize.value}} value)</b>
           </p>
           <br>
-          <a target='new' href='/new/{{project.id}}'>Become a KickBacker for this Project</a>
+          <a target='_blank' href='/new/{{project.id}}'>Become a KickBacker for this Project</a>
        <!-- TODO 
          <span style="font-size:24px;color:green">24d 12h 22m Remaining</span>
         -->
@@ -60,7 +60,7 @@
         <div class="backer-info">
           <img src='{{backers[backer].img}}' width='75' class="thumb">
           <h2>
-            <a href="http://kickstarter.com/profile/{{ backer }}">
+            <a target="_blank" href="http://kickstarter.com/profile/{{ backer }}">
               {{ backers[backer].name }}
             </a>
           </h2>
