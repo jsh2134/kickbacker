@@ -100,7 +100,7 @@ def key_redirect(project_id, backer_id):
 	print 'found key: %s' % key
 	redirect_url = datalib.get_redirect(app.rs, key)
 
-	redirect_url = '%s?ref=kickbacker' % (redirect_url)
+	redirect_url = '%s?utm_source=kickbacker&utm_campaign=kickbacker_share' % (redirect_url)
 
 	# TODO if you have cookie don't count
 	# Increment Clicks

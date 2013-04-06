@@ -4,6 +4,7 @@ import re
 import time
 import logging
 import hashlib
+import HTMLParser
 
 logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
 
@@ -65,6 +66,18 @@ def get_project_id(url):
                pid = url
 
        return pid
+
+
+def unescape_html(value):
+	try:
+		h = HTMLParser.HTMLParser()
+		unescaped = h.unescape(value)
+	except:
+		logging.exception("Could not escape: %s" % value)
+		unescaped = value
+
+	return unescaped
+
 
 
 #############################
@@ -157,19 +170,19 @@ def parse_project_page(project_id, soup):
 		logging.exception("Could not find project 'desc' attr")
 		logging.exception(str(desc_div))
 
-	author_a = soup.findAll('div', {'id':'creator-name'})
+	author_a = soup.findAll('a', {'data-modal-class':'modal-project-by'})
 	if not author_a:
 		logging.exception("Could not find project 'author' attr")
 	else:
 		try:
-			project['author'] = author_a[0].h3.a.contents[0]
+			project['author'] = author_a[0].contents[0]
 		except:
-			logging.exception("Could not find project 'author' attr")
+			logging.exception("Could not parse project 'author' attr")
 			logging.exception(str(author_a))
 
 		try:
 			project['author_link'] = \
-						find_attr('href', author_a[0].h3.a.attrs)
+						find_attr('href', author_a[0])
 		except:
 			logging.exception("Could not find project 'author_link' attr")
 			logging.exception(str(author_a))
@@ -257,7 +270,10 @@ def parse_project_page(project_id, soup):
 	prize_lis = prize_ul[0].findAll('li')
 	for li in prize_lis:
 		prize = {}
-		prize['title'] = li.h3.contents[0].strip()
+		try:
+			prize['title'] = li.h5.contents[0].strip()
+		except:
+			logging.exception('Problem parsing prize_li: %s' % str(li))
 		# strip commas and match digits
 		prize['value'] = re.compile('.*\$(\d+).*').match(prize['title'].replace(',','')).groups()[0]
 		prize['id'] = create_prize_id(project_id, prize['title'])
@@ -394,7 +410,7 @@ def add_prizes(prizes, project_id):
 		datalib.add_prize(app.rs, prize['id'])
 		datalib.add_project_prize(app.rs, project_id, prize['id'])
 		for key, value in prize.iteritems():
-			a = datalib.update_prize(app.rs, prize['id'], key, value)
+			a = datalib.update_prize(app.rs, prize['id'], key, unescape_html(value))
 			logging.info('Prizes: %s %s: %s' % ("Added" if a else "Existed", key, value))
 
 	# Add some prize at the end
@@ -416,7 +432,7 @@ def get_project(project_url):
 		if key == 'prizes':
 			a = add_prizes(project_dict['prizes'], project_id)
 		else:	
-			a = datalib.update_project(app.rs, project_id, key, value)
+			a = datalib.update_project(app.rs, project_id, key, unescape_html(value))
 
 		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 	
@@ -433,7 +449,7 @@ def get_backer(backer_url, backer_type):
 
 	backer_dict = parse_backer_page(backer_id, soup)
 	for key, value in backer_dict.iteritems():
-		a = datalib.update_backer(app.rs, backer_id, key, value)
+		a = datalib.update_backer(app.rs, backer_id, key, unescape_html(value))
 		logging.info('%s %s: %s for %s' % ("Added" if a else "Existed", key, value, backer_id))
 	
 	# Add Backer Type 
