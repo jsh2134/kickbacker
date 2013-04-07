@@ -6,3 +6,4 @@ celery-with-redis
 fabric
 boto
 supervisor
+mandrill
