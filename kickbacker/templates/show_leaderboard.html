@@ -2,18 +2,21 @@
 
 {% block header %}
 
-  {% if share_info %}
-    <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
+    <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
+    <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
+
     <script type='text/javascript'>
-     $('#myModal').modal('show');
+      $(function () {
+          $('#prize-desc-pop').popover({'placement':'bottom'});
+      });
     </script>
-  {% endif %}
 
 {% endblock header %}
 
 {% block content %}
 
-<input type=hidden value="{{project}}">
+<input name='project-vals' type=hidden value="{{project}}">
+<input name='share-info' type=hidden value="{{share_info}}">
 
 <div id='project-{{project.id}}' class='project-leaderboard'>
     <div class='project-leaderboard-container well' >
@@ -22,7 +25,7 @@
           <img src='{{project.img}}' width='150px' class='thumb'>
         </a>
         <h1>Kickbacker Leaderboard</h1>
-        <div class="caption">
+     Hi    <div class="caption">
           <a target="_blank" href="http://kickstarter.com/{{project.link}}">
             <span class='project-title'>{{ project.name }}</span>
           </a>
@@ -38,10 +41,13 @@
       <div class='project-leaderboard-kickback' style='float:right;'>
         <div>
           <h3> Your KickBack</h3>
-          <p class='prize-text'>{{project.backer_prize.desc}} 
+          <p class='prize-text'>{{ project.backer_prize.desc| truncate(200) }}
+          {% if project.backer_prize.desc|length > 199 %}
+          <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
+          {% endif %}
+          <br>
           <b>(A ${{project.backer_prize.value}} value)</b>
           </p>
-          <br>
           <a target='_blank' href='/new/{{project.id}}'>Become a KickBacker for this Project</a>
        <!-- TODO 
          <span style="font-size:24px;color:green">24d 12h 22m Remaining</span>
@@ -90,29 +96,8 @@
     </div>
   {% endfor %}
 </div>
-
-
-<!-- Project Create Info Modal -->
-<!-- Called when share_info is True -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Share this link with your Network!</h3>
-  </div>
-  <div class="modal-body">
-    <div id='your-link'>
-      <textarea id='your-link-area' class='input-xlarge'>
-        {{ project.kb_url }}
-      </textarea>
-      <span class='help-inline'>
-          Copy Your Link, Share with your Backers and Go!
-      </span>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-  </div>
-</div>
+  {% include 'help_project.html' %}
+  {% include 'share_modal.html' %}
 
 {% endblock content %}
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
+import urllib
 
 from flask import render_template
 from flask import request
@@ -132,11 +133,12 @@ def new_short_key():
 	project_id = request.form.get('project_id')
 	email = request.form.get('email')
 	kb_type = request.form.get('kb_type')
-	
+	awesm_url = urllib.unquote_plus(request.form.get('awesm_url'))
+
 	url = lib.strip_url_args(url)
 
 	create_new_project(backer_id, project_id, key, kb_url, \
-						url, email, kb_type)
+						url, email, kb_type, awesm_url)
 
 	return jsonify( {   'success':True, 
 						'message':'Added key:%s for backer:%s to project:%s' \
@@ -169,11 +171,11 @@ def show_prizes(project_id):
 
 
 def create_new_project(backer_id, project_id, key, \
-						kb_url, url, email, kb_type):
+						kb_url, url, email, kb_type, awesm_url):
 
 	# Queue up project scrape job
 	if datalib.add_project(app.rs, project_id):
-		tasks.harvest_project.delay(url)
+		tasks.harvest_project.delay(url, awesm_url)
 
 	# Queue up backer scrape job
 	if datalib.add_backer(app.rs, backer_id):
@@ -190,7 +192,6 @@ def create_new_project(backer_id, project_id, key, \
 	datalib.add_redirect(app.rs, key, url)
 	datalib.update_short_key(app.rs, key, 'clicks', 0)
 	datalib.update_short_key(app.rs, key, 'url', url)
-	datalib.update_short_key(app.rs, key, 'kb_url', kb_url)
 	datalib.update_short_key(app.rs, key, 'created', \
 										datetime.datetime.now())
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
@@ -245,7 +246,7 @@ def dashboard():
 								projects = project_dict,
 								total_clicks = total_clicks)
 
-def leaderboard(project_id, share_info=None):
+def leaderboard(project_id, share_info=None, arg_awesm_url=None):
 	""" Display project stats """
 	project = datalib.get_project(app.rs, project_id)
 
@@ -254,7 +255,8 @@ def leaderboard(project_id, share_info=None):
 										nf_type = "project",
 										nf_id = project_id)
 	else:
-		#TODO
+		#TODO dont allow this, now allowed because old scraped
+		# projects have no prizes
 		try:
 			project_prize = datalib.get_prize(app.rs, project['backer_prize'])
 		except:
@@ -293,11 +295,21 @@ def leaderboard(project_id, share_info=None):
 								)
 							)
 
-		kb_base_short = app.config['KB_BASE_SHORT']	
+		kb_base_short = app.config['KB_BASE_SHORT']
+
+		# Case where awesm_url is passed via the URL
+		if share_info == '2':
+			awesm_url = urllib.unquote_plus(arg_awesm_url)
+		elif share_info == '1':
+			awesm_url = project['awesm_url']
+		else:
+			awesm_url = ''
+
 		return render_template('show_leaderboard.html',
 									project = project,
 									backers = backer_dict,
 									sorted_backers = sorted_backers,
 									total_clicks = total_clicks,
 									share_info = share_info,
+									awesm_url = awesm_url,
 									kb_base_short = kb_base_short )

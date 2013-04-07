@@ -12,8 +12,8 @@ except:
 
 if celery_server:
 	@celery_server.task
-	def harvest_project(url):
-		kickstarter.get_project(url)
+	def harvest_project(url, awesm_url):
+		kickstarter.get_project(url, awesm_url)
 
 	@celery_server.task
 	def harvest_backer(url, backer_type):

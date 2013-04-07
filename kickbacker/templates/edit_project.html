@@ -6,6 +6,8 @@
     <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
     <script type='text/javascript' src='/static/js/jquery.tmpl.min.js'></script>
     <script type='text/javascript'>
+    // FYI if looking for popover js, its in kickbacker.js load-prizes
+
     $(function () {
         var project_id = $('#project_id').val();
         load_prizes(project_id);
@@ -23,7 +25,7 @@
         else {
             $.ajax({ 'type': 'POST',
                    'async': false, 
-                   'success': function () { window.location = '/'+project_id+'/leaderboard?first=1';},
+                   'success': function () { window.location = '/'+project_id+'/leaderboard?first=1'},
                    'cache': false,
                    'datatype': 'json',
                    'data': {
@@ -40,11 +42,6 @@
 
   </script>
 
-<!-- Dont Judge Me -->
-<!-- Doesnt Work Still -->
-<style type="text/css">
-table-striped tbody tr.highlight td { background-color: red; }
-</style>
 {% endblock header %}
 
 {% block content %}
@@ -76,18 +73,8 @@ table-striped tbody tr.highlight td { background-color: red; }
     </script>
   </table>
 
-      <div id='your-link'>
-        <textarea id='your-link-area' class='input-xlarge'>
-        </textarea>
-        <span class='help-inline'>
-          {% if lead_type == 'backer' %}
-            Copy Your Link and Go!
-          {% else %}
-            Copy Your Link, Share with your Backers and Go!
-          {% endif %}
-        </span>
-      </div>
     <button id='reward-select' style='float:right;display:none;' onclick='save_kickback()' class="btn btn-primary">Select Kickback</button>
   </div>
  </div>
+  {% include 'help_project.html' %}
 {% endblock content %}

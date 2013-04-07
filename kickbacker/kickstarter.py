@@ -5,6 +5,7 @@ import time
 import logging
 import hashlib
 import HTMLParser
+from types import StringType
 
 logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
 
@@ -69,6 +70,10 @@ def get_project_id(url):
 
 
 def unescape_html(value):
+	
+	if not value or not type(value) == StringType:
+		return value
+
 	try:
 		h = HTMLParser.HTMLParser()
 		unescaped = h.unescape(value)
@@ -170,7 +175,7 @@ def parse_project_page(project_id, soup):
 		logging.exception("Could not find project 'desc' attr")
 		logging.exception(str(desc_div))
 
-	author_a = soup.findAll('a', {'data-modal-class':'modal-project-by'})
+	author_a = soup.findAll('a', {'data-modal-class':'modal_project_by'})
 	if not author_a:
 		logging.exception("Could not find project 'author' attr")
 	else:
@@ -420,7 +425,7 @@ def add_prizes(prizes, project_id):
 	return True
 
 
-def get_project(project_url):
+def get_project(project_url, awesm_url):
 	logging.info("Parsing URL %s" % (project_url) )
 
 	resp = get_kickstarter_response(project_url, json_out=False)
@@ -433,8 +438,12 @@ def get_project(project_url):
 			a = add_prizes(project_dict['prizes'], project_id)
 		else:	
 			a = datalib.update_project(app.rs, project_id, key, unescape_html(value))
-
+	
 		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
+
+	# Add awesm URL
+	datalib.update_project(app.rs, project_id, 'awesm_url', awesm_url)
+
 	
 	return project_dict
 
@@ -474,7 +483,9 @@ def get_projects(search_key):
 	
 	return project_map
 
-
+#############
+# Not in Use
+#############
 def get_backers(url):
 
 	url = lib.strip_url_args(url)

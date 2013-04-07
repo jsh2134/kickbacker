@@ -8,6 +8,11 @@ img {
 	max-width:100%;
 }
 
+textarea {
+	    text-align:center;
+	    padding: 5px;
+}
+
 .main-container{
 	margin:20px;
 }
@@ -95,20 +100,25 @@ img.thumb {
 	float:left;
 }
 
+/** Main Page Contact **/
+.contact {
+	width:300px;
+	margin:0px 10px;
+}
+
 /** URL Signup **/
 .signup {
 	width:340px;
-	margin:10px;
-}
-
-
-#your-link {
-	display:none;
+	margin:0px 10px;
 }
 
 #your-link-area {
-	margin-top:15px; 
-	font-size:1.6em;
+	margin-top:5px;
+	padding:5px 0px 0px 0px;
+	font-size:16px;
+	width:400px;
+	height:60px;
+	display:block;
 }
 
 .index-project-leaderboard {
@@ -156,4 +166,5 @@ img.thumb {
 }
 
 
+.highlight td { background-color: #99ccff; }
 

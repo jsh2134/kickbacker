@@ -1,5 +1,17 @@
 {% extends 'base.html' %}
 
+{% block header %}
+  {% if lead_type == 'backer' %}
+      <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
+      <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
+      <script type='text/javascript'>
+        $(function () {
+            $('#prize-desc-pop').popover({'placement':'bottom'});
+        });
+      </script>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="span7 well">
@@ -10,49 +22,72 @@
       <h1>Your Backers are Your Biggest Fans</h1>
     {% endif %}
     </div>
+
+    {% if lead_type == 'backer' %}
+    <div class='buzzword-wrapper'>
+      <div class="buzzword-elem">
+          <p class="lead">
+            <br>
+              Drive the most people to the project page of <b>{{ project.name }}</b> using your <b>KickBacker</b> link and win.
+          </p>
+          <div id='project-{{project.id}}' class='index-project-leaderboard'>
+            <p>
+            <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='215px' class='thumb'></a>
+            
+           <b> Winning KickBacker Receives:</b><br>{{ project.backer_prize.desc| truncate(350) }}
+              {% if project.backer_prize.desc|length > 350 %}
+                <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
+              {% endif %}
+            </p>
+            <hr>
+          </div>
+      </div>
+      <div class="buzzword-elem">
+        <!--
+        <div class="bw-screen">
+              <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
+        </div>
+        -->
+        <div class="bw-text">
+          <p class="lead">
+              Signup for a <b>KickBacker</b> Link and Share with your network on Twitter, Facebook and elsewhere.
+          </p>
+        </div>
+        <div class="bw-screen">
+              <img class="thumb" src="/static/img/followers4.jpg" width='185px'>
+        </div>
+      </div>
+    </div>
+    {% else %}
+
     <div class='buzzword-wrapper'>
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
-            {% if lead_type == 'backer' %}
             <br>
-              Drive the most people to the project page of <b>{{ project.name }}</b> using your kickbacker link and win.
-            {% elif lead_type == 'owner' %}
-             Incentivize your backers to spread the word about your project. Reward them for driving more backers and more hits to your project page.
-            {% endif %}
+             <b>Incentivize</b> your backers to spread the word about your project. <b>Reward</b> them for using their network to drive more backers to your project page.
           </p>
         </div>
         <div class="bw-screen">
-            {% if lead_type == 'backer' %}
-              Winner gets a <b>{{project.backer_prize.desc}}.</b>
-              <!--<img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'> -->
-            {% elif lead_type == 'owner' %}
               <img class="thumb" src="/static/img/backers-listed.png" width='225px'>
-            {% endif %}
         </div>
       </div>
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
-            {% if lead_type == 'backer' %}
-              Signup for a <b>kickbacker.co</b> Link and Share with your network on Twitter, Facebook and elsewhere.
-            {% elif lead_type == 'owner' %}
-              Signup for kickbacker, share your link with your backers, and fund your project! 
-            {% endif %}
+              Signup for <b>KickBacker</b>, share your personalized link with existing backers, and get closer to funding your project!
           </p>
         </div>
         <div class="bw-screen">
-            {% if lead_type == 'backer' %}
-              <img class="thumb" src="/static/img/followers4.jpg" width='185px'>
-            {% elif lead_type == 'owner' %}
               <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
-            {% endif %}
         </div>
       </div>
     </div>
+  {% endif %} <!-- end separation of owner/backer template -->
   </div>
   <div class="span4">
   {% include 'get_project.html' %}
+  {% include 'help_project.html' %}
   </div>
 </div>
 

@@ -31,7 +31,7 @@ function get_backers(url, callback, err_callback) {
            'url': '/project/backers'
            });
   }
-function save_key(key, backer_id, project_id, url, kb_url, email, kb_type) {
+function save_key(key, backer_id, project_id, url, kb_url, email, kb_type, awesm_url) {
     $.ajax({ 'type': 'POST',
            'async': false, 
            'cache': false,
@@ -43,7 +43,8 @@ function save_key(key, backer_id, project_id, url, kb_url, email, kb_type) {
                 'url' : url,
                 'kb_url' : kb_url,
                 'email' : email,
-                'kb_type': kb_type
+                'kb_type': kb_type,
+                'awesm_url': awesm_url
            },
            'url': '/key'
            });
@@ -125,20 +126,19 @@ function create_project() {
     var backer_id = get_backer_id(profile);
     var project_id = get_project_id(url);
     var kb_url = build_kb_url(project_id, backer_id, kb_type);
+    var awesm_url = '';
     console.log(kb_url)
     get_awesm_url(kb_url, function(data) {
                 $('#button-div').toggle();
-                $('#your-link').toggle();
-                $('#your-link-area').val(data.awesm_url);
-
+                awesm_url = encodeURIComponent(data.awesm_url);
                 // create project
-                save_key(data.path, backer_id, project_id, url, kb_url, email, kb_type);
+                save_key(data.path, backer_id, project_id, url, kb_url, email, kb_type, awesm_url);
               }, function(data) {
                   console.log(data);
                   $('#your-link').html("An Error has occurred when shortening your url: " + data.responseText);
                   });
   if (kb_type == 'backer') {
-     $('#myModal').modal('show');
+     window.location = "/"+project_id+"/leaderboard?first=2&url="+encodeURIComponent(awesm_url);
   }
   else {
      window.location = "/project/"+project_id+"/edit/";

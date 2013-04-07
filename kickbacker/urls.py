@@ -54,7 +54,8 @@ def respond_projectboard():
 
 @app.route('/<project_id>/leaderboard', methods=['GET'])
 def respond_leaderboard(project_id):
-	return views.leaderboard(project_id, request.values.get('first'))
+	return views.leaderboard(project_id, request.values.get('first'), \
+										 request.values.get('url'))
 
 @app.route('/contact')
 def respond_contact():
