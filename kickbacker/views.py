@@ -330,11 +330,9 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		if backer_arg:
 			print backer_arg, project['kb_creator']
 			if project['kb_creator'] == backer_arg:
-				logging.info('owner')
 				kb_type = 'owner'
 				awesm_url = project['awesm_url']
 			else:
-				logging.info('backer')
 				kb_type = 'backer'
 				my_backer_dict = datalib.get_backer(app.rs, backer_arg)
 				awesm_url = my_backer_dict['awesm_url']
