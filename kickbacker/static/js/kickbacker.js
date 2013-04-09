@@ -138,7 +138,7 @@ function create_project() {
                   $('#your-link').html("An Error has occurred when shortening your url: " + data.responseText);
                   });
   if (kb_type == 'backer') {
-     window.location = "/"+project_id+"/leaderboard?first=2&url="+encodeURIComponent(awesm_url);
+     window.location = "/"+project_id+"/leaderboard/"+backer_id+"/share";
   }
   else {
      window.location = "/project/"+project_id+"/edit/";

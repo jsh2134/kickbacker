@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 
 from kickbacker import kickstarter
+from kickbacker.email import contact
+
 import logging
 
 try:
@@ -12,12 +14,16 @@ except:
 
 if celery_server:
 	@celery_server.task
-	def harvest_project(url, awesm_url):
-		kickstarter.get_project(url, awesm_url)
+	def harvest_project(url):
+		kickstarter.get_project(url)
 
 	@celery_server.task
-	def harvest_backer(url, backer_type):
-		kickstarter.get_backer(url, backer_type)
+	def harvest_backer(url):
+		kickstarter.get_backer(url)
 
-
-
+	@celery_server.task
+	def welcome_backer(email, kb_type, backer_id, \
+									project_id, new_backer):
+		contact.send_welcome_mail(email, kb_type, backer_id,
+									 project_id, new_backer)
+	

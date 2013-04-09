@@ -1,33 +1,43 @@
 {% block header %}
 
-  {% if share_info == '2' or share_info == '1' %}
-    <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
+  {% if share == True %}
     <script type='text/javascript'>
+    </script>
+    <script type='text/javascript' src='/static/js/bootstrap-modal.js'></script>
+    {% if kb_type == 'backer' %}
+        <script type='text/javascript'>
 
-    //<![CDATA[
-    (function() {
-        var shr = document.createElement('script');
-        shr.src = '//dtym7iokkjlif.cloudfront.net/assets/pub/shareaholic.js';
-        shr.type = 'text/javascript';
-        shr.async = 'true';
-        shr.onload = shr.onreadystatechange = function() {
-        var rs = this.readyState;
-        if (rs && rs != 'complete' && rs != 'loaded') return;
-           var apikey = '63ff827a6aa68452f29f90ed5b944e7a'
-           try { Shareaholic.init(apikey); } catch (e) {}
-                                    };
-           var s = document.getElementsByTagName('script')[0];
-           s.parentNode.insertBefore(shr, s);
-                                        })();
-             //]]>
+        //<![CDATA[
+        (function() {
+            var shr = document.createElement('script');
+            shr.src = '//dtym7iokkjlif.cloudfront.net/assets/pub/shareaholic.js';
+            shr.type = 'text/javascript';
+            shr.async = 'true';
+            shr.onload = shr.onreadystatechange = function() {
+            var rs = this.readyState;
+            if (rs && rs != 'complete' && rs != 'loaded') return;
+               var apikey = '63ff827a6aa68452f29f90ed5b944e7a'
+               try { Shareaholic.init(apikey); } catch (e) {}
+                                        };
+               var s = document.getElementsByTagName('script')[0];
+               s.parentNode.insertBefore(shr, s);
+                                            })();
+                 //]]>
+        </script>
+      {% endif %}
 
+   <script type='text/javascript'>
     $(document).ready(function() {
-        /*  if share_info == '2' 
+        /*  if kb_type == 'backer' 
            New KickBacker - URL is redirect for KS page
-            if share_info == '1' 
+            if kb_tyoe == 'owner' 
            New Project - URL is for Kickbacker Backer Signup */
       var awesm_url = $('#awesm-url').val();
-      $('#your-link-area').val('I backed this project on Kickstarter and you should too! ' + awesm_url);
+      {% if kb_type == 'owner' %}
+        $('#your-link-area').val('Existing Backers! Sign up to become a KickBacker for this project and win a KickBack! ' + awesm_url);
+      {% else %}
+        $('#your-link-area').val('I backed this project on Kickstarter and you should too! ' + awesm_url);
+      {% endif %}
       $('#myModal').modal('show');
     });
 
@@ -41,18 +51,25 @@
 
 <input type='hidden' id= 'awesm-url' value='{{awesm_url}}' >
 
-<!-- Backer Signup Modal -->
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Share this link with your Networks!</h3>
+    {% if kb_type == 'owner' %}
+      <h3 id="myModalLabel">Share this with your Backers on KickStarter!</h3>
+    {% else %}
+      <h3 id="myModalLabel">Share this link with your Networks!</h3>
+    {% endif %}
   </div>
   <div class="modal-body">
     <div id='your-link' align="center">
       Copy and Paste this Message:<br>
       <textarea id='your-link-area' class='input-xlarge'> </textarea>
     </div>
-    <div class='shareaholic-canvas' data-shareaholic-widgets='share_buttons'></div>
+
+    {% if kb_type == 'backer' %}
+      <div class='shareaholic-canvas' data-shareaholic-widgets='share_buttons'></div>
+    {% endif %}
+
     <div id='project-{{project.id}}' class='index-project-leaderboard'>
         <p>
         <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='100px' class='thumb'></a>

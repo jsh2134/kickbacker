@@ -174,20 +174,43 @@ def create_new_project(backer_id, project_id, key, \
 						kb_url, url, email, kb_type, awesm_url):
 
 	# Queue up project scrape job
+	# will only add project if new project created
+	# new kickbackers will use exsting project
 	if datalib.add_project(app.rs, project_id):
-		tasks.harvest_project.delay(url, awesm_url)
+		# Add Project specific values
+		datalib.update_project(app.rs, project_id, 'awesm_url', awesm_url)
+		datalib.update_project(app.rs, project_id, 'kb_creator', backer_id)
 
+		tasks.harvest_project.delay(url)
+
+	new_backer = False
 	# Queue up backer scrape job
 	if datalib.add_backer(app.rs, backer_id):
-		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id), kb_type)
+		tasks.harvest_backer.delay(kickstarter.BACKER_URL % (backer_id))
+		new_backer = True
 
+	# Queue up backer welcome email job
+	# have: email, kb_type, new_backer
+	# need: project info, backer info
+	tasks.welcome_backer.delay(email, kb_type, backer_id,\
+									 project_id, new_backer)
+
+	# Add KickBacker
 	datalib.add_kickbacker(app.rs, email)
 	datalib.update_kickbacker(app.rs, email, 'project', project_id)
 	datalib.update_kickbacker(app.rs, email, 'backer',  backer_id)
 	datalib.update_kickbacker(app.rs, email, 'backer_type',  kb_type)
+
 	datalib.add_project_backer(app.rs, project_id, backer_id)
-	datalib.add_short_key(app.rs, key)
+
+
+	# Add Backer specific values
+	datalib.update_backer(app.rs, backer_id, 'type', kb_type)
+	datalib.update_backer(app.rs, backer_id, 'awesm_url', awesm_url)
 	datalib.add_backer_short_key(app.rs, backer_id, key)
+
+	# Add Short Key for the project
+	datalib.add_short_key(app.rs, key)
 	datalib.add_project_short_key(app.rs, project_id, key)
 	datalib.add_redirect(app.rs, key, url)
 	datalib.update_short_key(app.rs, key, 'clicks', 0)
@@ -197,6 +220,7 @@ def create_new_project(backer_id, project_id, key, \
 	datalib.update_short_key(app.rs, key, 'project_id', project_id)
 	datalib.update_short_key(app.rs, key, 'backer_id', backer_id)
 	datalib.update_short_key(app.rs, key, 'backer_type',  kb_type)
+
 
 
 def projectboard():
@@ -246,7 +270,7 @@ def dashboard():
 								projects = project_dict,
 								total_clicks = total_clicks)
 
-def leaderboard(project_id, share_info=None, arg_awesm_url=None):
+def leaderboard(project_id, share=False, backer_arg=None):
 	""" Display project stats """
 	project = datalib.get_project(app.rs, project_id)
 
@@ -297,19 +321,28 @@ def leaderboard(project_id, share_info=None, arg_awesm_url=None):
 
 		kb_base_short = app.config['KB_BASE_SHORT']
 
-		# Case where awesm_url is passed via the URL
-		if share_info == '2':
-			awesm_url = urllib.unquote_plus(arg_awesm_url)
-		elif share_info == '1':
-			awesm_url = project['awesm_url']
-		else:
-			awesm_url = ''
+		awesm_url = ''
+		kb_type = ''
+		logging.info('choos')
+		if backer_arg:
+			print backer_arg, project['kb_creator']
+			if project['kb_creator'] == backer_arg:
+				logging.info('owner')
+				kb_type = 'owner'
+				awesm_url = project['awesm_url']
+			else:
+				logging.info('backer')
+				kb_type = 'backer'
+				my_backer_dict = datalib.get_backer(app.rs, backer_arg)
+				awesm_url = my_backer_dict['awesm_url']
+
 
 		return render_template('show_leaderboard.html',
 									project = project,
 									backers = backer_dict,
 									sorted_backers = sorted_backers,
 									total_clicks = total_clicks,
-									share_info = share_info,
+									kb_type = kb_type,
+									share = share,
 									awesm_url = awesm_url,
 									kb_base_short = kb_base_short )

@@ -18,6 +18,7 @@
     });
     function save_kickback() {
         var project_id = $('#project_id').val();
+        var backer_id = $('#backer_id').val();
         var kickback_id = $("input[name='chosen-prize']:checked").val()
         if (kickback_id === undefined) {
           window.alert('Please select a KickBack and try again.');
@@ -25,7 +26,8 @@
         else {
             $.ajax({ 'type': 'POST',
                    'async': false, 
-                   'success': function () { window.location = '/'+project_id+'/leaderboard?first=1'},
+                   //'success': function () { window.location = '/'+project_id+'/leaderboard/share?kb_type=owner'},
+                   'success': function () { window.location = '/'+project_id+'/leaderboard/'+backer_id+'/share'},
                    'cache': false,
                    'datatype': 'json',
                    'data': {
@@ -45,7 +47,8 @@
 {% endblock header %}
 
 {% block content %}
-  <input type='hidden' value="{{project['id']}}" name='pid' id="project_id">
+  <input type='hidden' value="{{project.id}}" name='pid' id="project_id">
+  <input type='hidden' value="{{project.kb_creator}}" id="backer_id">
 
   <div class="row">
     <div class="span7 well">

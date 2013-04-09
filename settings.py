@@ -19,8 +19,10 @@ class Config(object):
 class ProdConfig(Config):
 	DEBUG=False
 	KB_BASE_SHORT = 'http://kickbacker.co/'
+	KB_BASE = 'http://kickbacker.co/'
 
 # Run Server in Debug Mode
 class DevConfig(Config):
 	DEBUG=True
 	KB_BASE_SHORT = 'http://demo.awe.sm/'
+	KB_BASE = 'http://localhost:5000/'

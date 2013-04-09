@@ -16,7 +16,7 @@
 {% block content %}
 
 <input name='project-vals' type=hidden value="{{project}}">
-<input name='share-info' type=hidden value="{{share_info}}">
+<input name='share' type=hidden value="{{share}}">
 
 <div id='project-{{project.id}}' class='project-leaderboard'>
     <div class='project-leaderboard-container well' >
@@ -25,7 +25,7 @@
           <img src='{{project.img}}' width='150px' class='thumb'>
         </a>
         <h1>Kickbacker Leaderboard</h1>
-     Hi    <div class="caption">
+         <div class="caption">
           <a target="_blank" href="http://kickstarter.com/{{project.link}}">
             <span class='project-title'>{{ project.name }}</span>
           </a>

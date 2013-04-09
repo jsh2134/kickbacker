@@ -54,8 +54,16 @@ def respond_projectboard():
 
 @app.route('/<project_id>/leaderboard', methods=['GET'])
 def respond_leaderboard(project_id):
-	return views.leaderboard(project_id, request.values.get('first'), \
-										 request.values.get('url'))
+	return views.leaderboard(project_id,request.values.get('url'))
+
+@app.route('/<project_id>/leaderboard/<backer_arg>/share/', methods=['GET'])
+def respond_leaderboard_share(project_id, backer_arg=None):
+	return views.leaderboard(project_id, share=True, \
+					#kb_type=request.values.get('kb_type'), \
+					#arg_awesm_url=request.values.get('url'), \
+					backer_arg = backer_arg)
+	#TODO need kb_type?
+
 
 @app.route('/contact')
 def respond_contact():

@@ -425,13 +425,13 @@ def add_prizes(prizes, project_id):
 	return True
 
 
-def get_project(project_url, awesm_url):
+def get_project(project_url):
 	logging.info("Parsing URL %s" % (project_url) )
+	project_id = get_project_id(project_url)
 
 	resp = get_kickstarter_response(project_url, json_out=False)
 	soup = BeautifulSoup.BeautifulSoup(resp)
 
-	project_id = get_project_id(project_url)
 	project_dict = parse_project_page(project_id, soup)
 	for key, value in project_dict.iteritems():
 		if key == 'prizes':
@@ -441,14 +441,29 @@ def get_project(project_url, awesm_url):
 	
 		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 
-	# Add awesm URL
-	datalib.update_project(app.rs, project_id, 'awesm_url', awesm_url)
 
-	
+	# Finalize Scrape
+	datalib.update_project(app.rs, project_id, 'scraped', 1)
+
 	return project_dict
 
 
-def get_backer(backer_url, backer_type):
+def is_scrape_complete(type_obj, type_id):
+	""" Return True, is 'scraped' value has been added at end of scrape routines"""
+	if type_obj == 'project':
+		obj_get = datalib.get_project
+	else:
+		obj_get = datalib.get_backer
+
+	my_obj = obj_get(app.rs, type_id)
+
+	if my_obj and 'scraped' in my_obj and int(my_obj['scraped']) == 1:
+		return True
+	else:
+		return False
+
+
+def get_backer(backer_url):
 	logging.info("Parsing URL %s" % (backer_url) )
 
 	resp = get_kickstarter_response(backer_url, json_out=False)
@@ -461,8 +476,8 @@ def get_backer(backer_url, backer_type):
 		a = datalib.update_backer(app.rs, backer_id, key, unescape_html(value))
 		logging.info('%s %s: %s for %s' % ("Added" if a else "Existed", key, value, backer_id))
 	
-	# Add Backer Type 
-	datalib.update_backer(app.rs, backer_id, 'type', backer_type)
+	# Finalize Scrape
+	datalib.update_backer(app.rs, backer_id, 'scraped', 1)
 
 	return backer_dict
 
