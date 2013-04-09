@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+from logging.handlers import SMTPHandler
 
 from flask import Flask
 import redis
@@ -7,7 +8,12 @@ import redis
 class KickFlask(Flask):
 
 	def setup_logging(self):
-		# Set logging
+
+		# Logging format
+		kb_fmt = u'[%(asctime)s %(levelname)s] - %(processName)s (%(process)s) - (%(module)s:%(funcName)s:%(lineno)s) %(message)s'
+		kb_formatter = logging.Formatter(fmt=kb_fmt)
+
+		# File Log
 		log_filename = self.config['LOGFILE']
 		file_handler = RotatingFileHandler(log_filename)
 
@@ -16,12 +22,21 @@ class KickFlask(Flask):
 		else:
 			file_handler.setLevel(logging.ERROR)
 
-		kb_fmt = u'[%(asctime)s %(levelname)s] - %(processName)s (%(process)s) - (%(module)s:%(funcName)s:%(lineno)s) %(message)s'
+		file_handler.setFormatter(kb_formatter)
+		self.logger.addHandler(file_handler)
+
+		# Email Log
+		credentials = [ self.config['SMTP_USER'], self.config['SMTP_PASS'] ]
+		mail_handler = SMTPHandler(self.config['SMTP_HOST'], \
+                                self.config['ERROR_EMAIL_FROM'], \
+                                [self.config['ERROR_EMAIL_TO']], \
+								'Kickbacker Server Failure',\
+								credentials =credentials)
+		mail_handler.setLevel(logging.ERROR)
+		self.logger.addHandler(mail_handler)
 		kb_formatter = logging.Formatter(fmt=kb_fmt)
 		file_handler.setFormatter(kb_formatter)
 
-		self.logger.addHandler(file_handler)
-		
 
 	def connect_redis(self):
 		try:

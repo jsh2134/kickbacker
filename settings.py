@@ -1,4 +1,5 @@
 import os
+import secrets
 
 # Here lie the settings
 
@@ -14,6 +15,12 @@ class Config(object):
 	CELERY_BROKER = 'redis://%s:%s/%s' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 	CELERY_BACKEND = 'redis://%s:%s/%s' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 	CELERY_INCLUDES = ['kickbacker.celery_queue.tasks']
+	SMTP_HOST = 'smtp.mandrillapp.com'
+	SMTP_PORT = '587'
+	SMTP_USER = 'jsh2134+kickbacker@gmail.com'
+	SMTP_PASS = secrets.MANDRILL
+	ERROR_EMAIL_TO = 'jsh2134+kickbacker-error@gmail.com'
+	ERROR_EMAIL_FROM = 'kickserver@kickbacker.co'
 
 
 class ProdConfig(Config):
