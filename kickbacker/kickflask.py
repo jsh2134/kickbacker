@@ -33,7 +33,7 @@ class KickFlask(Flask):
                                 self.config['ERROR_EMAIL_FROM'], \
                                 [self.config['ERROR_EMAIL_TO']], \
 								'Kickbacker Server Failure',\
-								credentials = credentials, secure=() )
+								credentials = credentials )
 		mail_handler.setLevel(logging.ERROR)
 		mail_handler.setFormatter(kb_formatter)
 		self.logger.addHandler(mail_handler)
