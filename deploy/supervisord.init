@@ -34,3 +34,4 @@ stop()
 	        echo -n $"Shutting down $prog: "
 		        [ -f $PIDFILE ] && killproc $prog || success $"$prog shutdown"
 			        echo
+}
