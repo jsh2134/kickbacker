@@ -1,7 +1,6 @@
 
 account_info = { 'from_email' : 'kickbacker@kickbacker.co',
 				 'from_name' : 'KickBacker',
-				 'bcc' : 'jsh2134-kb-all@gmail.com',
 				}
 
 

@@ -37,7 +37,6 @@ def send_mail(to, template_subject, template_content, template):
 			"subject": template_subject,
 			"from_email": config.account_info['from_email'],
 			"from_name": config.account_info['from_name'],
-			"bcc_address": config.account_info['bcc'],
 			"to": [
 				{
 					"email": to,
