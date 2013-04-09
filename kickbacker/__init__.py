@@ -1,5 +1,5 @@
 from kickflask import KickFlask
-from kickbacker import local_settings
+import local_settings
 
 app = KickFlask(__name__)
 

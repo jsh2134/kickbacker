@@ -27,11 +27,11 @@ def respond_index(project_id):
 	# Redirect to backer focused page
 	if project_id:
 		lead_type = 'backer'
-		#TODO
 		try:
 			project_prize = datalib.get_prize(app.rs, project['backer_prize'])
 		except:
-			project_prize = 'No Prize to see here Big Guy'
+			logging.exception('Index: No prize found for project %s' % project)
+			project_prize = "No Prize Has been Set"
 		project['backer_prize'] = project_prize
 	else:
 		lead_type = 'owner'
@@ -282,12 +282,12 @@ def leaderboard(project_id, share=False, backer_arg=None):
 										nf_type = "project",
 										nf_id = project_id)
 	else:
-		#TODO dont allow this, now allowed because old scraped
-		# projects have no prizes
 		try:
 			project_prize = datalib.get_prize(app.rs, project['backer_prize'])
 		except:
-			project_prize = "No Prize Here Bro"
+			logging.exception('Leaderboard: No prize found for project %s' % project)
+			project_prize = "No Prize Has been Set"
+
 		project['backer_prize'] = project_prize
 
 		project_backers = datalib.get_project_backers(app.rs, project_id)
@@ -297,9 +297,9 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
+			#if 'backer_type' not in backer_info or backer_info['backer_type'] == 'backer':
 			# Ignore Owners
-			# TODO remove this when data is wiped
-			if 'backer_type' not in backer_info or backer_info['backer_type'] == 'backer':
+			if backer_info['backer_type'] == 'backer':
 				backer_dict[backer_id] = backer_info
 				backer_key_list = datalib.get_backer_short_keys(app.rs, backer_id)
 				for key_id in backer_key_list:
