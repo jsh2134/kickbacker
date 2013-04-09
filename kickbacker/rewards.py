@@ -13,7 +13,7 @@ def check_for_rewards(key_id, referrer):
 	for reward_key, reward_vals in REWARD_MAP.iteritems():
 		if reward_vals['func'](referrer):
 			if reward_vals['type'] == 'incr':
-				datalib.inc_rewards(app.rs, key_id, reward_key)
+				datalib.incr_rewards(app.rs, key_id, reward_key)
 			else:
 				datalib.add_rewards(app.rs, key_id, reward_key)
 	return True
