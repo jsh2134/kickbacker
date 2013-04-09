@@ -31,11 +31,10 @@ class KickFlask(Flask):
                                 self.config['ERROR_EMAIL_FROM'], \
                                 [self.config['ERROR_EMAIL_TO']], \
 								'Kickbacker Server Failure',\
-								credentials =credentials)
+								credentials =credentials )
 		mail_handler.setLevel(logging.ERROR)
+		mail_handler.setFormatter(kb_formatter)
 		self.logger.addHandler(mail_handler)
-		kb_formatter = logging.Formatter(fmt=kb_fmt)
-		file_handler.setFormatter(kb_formatter)
 
 
 	def connect_redis(self):

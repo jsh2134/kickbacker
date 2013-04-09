@@ -70,6 +70,7 @@ def respond_contact():
 @app.route('/error/')
 def force_error():
 	logging.error('Some Error')
+	print 'errors'
 	try:
 		print jeff
 	except:
