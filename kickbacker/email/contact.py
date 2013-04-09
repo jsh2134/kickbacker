@@ -90,7 +90,7 @@ def send_welcome_mail(to_email, kb_type, backer_id, project_id, new_backer):
 		body_text = config.body_owner
 		template_subject = 'Welcome to KickBacker - You are One Step Closer'
 		awesm_url = project['awesm_url']
-		leaderboard_url = '%s/%s/leaderboard/%s/share' % \
+		leaderboard_url = '%s%s/leaderboard/%s/share' % \
 								 (app.config['KB_BASE'],project_id, backer_id)
 	else:
 		body_text = config.body_kickbacker
