@@ -27,7 +27,8 @@ class KickFlask(Flask):
 
 		# Email Log
 		credentials = [ self.config['SMTP_USER'], self.config['SMTP_PASS'] ]
-		mail_handler = SMTPHandler(self.config['SMTP_HOST'], \
+		host_info = [ self.config['SMTP_HOST'], self.config['SMTP_PORT'] ]
+		mail_handler = SMTPHandler(host_info, \
                                 self.config['ERROR_EMAIL_FROM'], \
                                 [self.config['ERROR_EMAIL_TO']], \
 								'Kickbacker Server Failure',\
