@@ -207,6 +207,7 @@ def create_new_project(backer_id, project_id, key, \
 	# Add Backer specific values
 	datalib.update_backer(app.rs, backer_id, 'type', kb_type)
 	datalib.update_backer(app.rs, backer_id, 'awesm_url', awesm_url)
+	datalib.update_backer(app.rs, backer_id, 'backer_type', kb_type)
 	datalib.add_backer_short_key(app.rs, backer_id, key)
 
 	# Add Short Key for the project
