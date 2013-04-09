@@ -1,5 +1,6 @@
+
 function get_awesm_url(url, callback, err_callback) {
-    var aws_key = '5c8b1a212434c2153c2f2c2f2c765a36140add243bf6eae876345f8fd11045d9';
+    var aws_key = 'f38b55a0203df3f21767698a5e82fd061e4c937a2c128212ff55720434f34f57';
     var aws_app = 'mKU7uN';
     $.ajax({ 'type': 'POST',
            'async': false, 
