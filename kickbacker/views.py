@@ -297,9 +297,8 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
-			#if 'backer_type' not in backer_info or backer_info['backer_type'] == 'backer':
 			# Ignore Owners
-			if backer_info['backer_type'] == 'backer':
+			if 'backer_type' in backer_info and backer_info['backer_type'] == 'backer':
 				backer_dict[backer_id] = backer_info
 				backer_key_list = datalib.get_backer_short_keys(app.rs, backer_id)
 				for key_id in backer_key_list:
