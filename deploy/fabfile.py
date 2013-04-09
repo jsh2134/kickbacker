@@ -142,6 +142,9 @@ def install_web():
 	# Deploy Code
 	update_code()
 
+	# Add Local Settings
+	add_local_settings()
+
 	# Install Redis
 	install_redis()
 
@@ -178,6 +181,9 @@ def update_code():
 
 		sudo('tar -xvf %s' % os.path.join(REMOTE_DIR, 'app.tar'))
 
+def add_local_settings():
+	with cd(REMOTE_DIR):
+		sudo("""echo 'ENV="production"' > local_settings.py """)
 
 def install_redis():
 

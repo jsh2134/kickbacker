@@ -233,6 +233,9 @@ def projectboard():
 
 		if 'clicks' in project_dict[project_id]:
 			total_clicks += int(project_dict[project_id]['clicks'])
+		else:
+			total_clicks = 0
+
 
 	return render_template('show_projectboard.html',
 								projects = project_dict,

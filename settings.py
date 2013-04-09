@@ -18,7 +18,7 @@ class Config(object):
 
 class ProdConfig(Config):
 	DEBUG=False
-	KB_BASE_SHORT = 'http://kickbacker.co/'
+	KB_BASE_SHORT = 'http://awe.sm/'
 	KB_BASE = 'http://kickbacker.co/'
 
 # Run Server in Debug Mode
