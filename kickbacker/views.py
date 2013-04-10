@@ -38,9 +38,11 @@ def respond_index(project_id):
 	else:
 		lead_type = 'owner'
 	
+	sample_board_link = ''
 	sample_projects = list(datalib.get_projects(app.rs))
-	sample_project_id = random.choice(sample_projects)
-	sample_board_link = '%s/leaderboard/' % sample_project_id
+	if sample_projects:
+		sample_project_id = random.choice(sample_projects)
+		sample_board_link = '%s/leaderboard/' % sample_project_id
 	return render_template('index.html', project=project,
 										 lead_type=lead_type,
 										 sample_board=sample_board_link)
