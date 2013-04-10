@@ -280,7 +280,7 @@ def parse_project_page(project_id, soup):
 		except:
 			logging.exception('Problem parsing prize_li: %s' % str(li))
 		# strip commas and match digits
-		prize['value'] = re.compile('.*\$(\d+).*').match(prize['title'].replace(',','')).groups()[0]
+		prize['value'] = re.compile('.*(\d+).*').match(prize['title'].replace(',','')).groups()[0]
 		prize['id'] = create_prize_id(project_id, prize['title'])
 
 		try:
