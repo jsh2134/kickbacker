@@ -435,6 +435,8 @@ def is_valid_scrape(obj_dict, reqs):
 				logging.info('%s is not valid %s' % (key, obj_dict[key]))
 				return False
 		return True
+	logging.info(obj_dict.keys())
+	logging.info(reqs)
 	return False
 
 def get_project(project_url):
