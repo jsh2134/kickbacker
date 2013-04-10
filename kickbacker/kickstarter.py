@@ -432,6 +432,7 @@ def is_valid_scrape(obj_dict, reqs):
 		# Keys not False or blank
 		for key in reqs:
 			if not obj_dict[key]:
+				logging.info('%s is not valid %s' % (key, obj_dict[key]))
 				return False
 		return True
 	return False
