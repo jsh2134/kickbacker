@@ -1,15 +1,21 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  {% if lead_type == 'backer' %}
       <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
       <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
       <script type='text/javascript'>
         $(function () {
             $('#prize-desc-pop').popover({'placement':'bottom'});
+            $('#kickback-desc-pop').popover({'placement':'right'});
+            $('#leaderboard-desc').popover({'placement':'right'});
+            $('#kickback-share-pop').popover({'placement':'right'});
         });
+        function focusInput() {
+          $('#ks-email').focus();
+          }
+
       </script>
-  {% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -26,36 +32,31 @@
     {% if lead_type == 'backer' %}
     <div class='buzzword-wrapper'>
       <div class="buzzword-elem">
-          <p class="lead">
-            <br>
-              Drive the most people to the project page of <b>{{ project.name }}</b> using your <b>KickBacker</b> link and win.
-          </p>
-          <div id='project-{{project.id}}' class='index-project-leaderboard'>
-            <p>
-            <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='215px' class='thumb'></a>
-            
-           <b> Winning KickBacker Receives:</b><br>{{ project.backer_prize.desc| truncate(350) }}
-              {% if project.backer_prize.desc|length > 350 %}
-                <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
-              {% endif %}
-            </p>
-            <hr>
-          </div>
-      </div>
-      <div class="buzzword-elem">
-        <!--
-        <div class="bw-screen">
-              <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
-        </div>
-        -->
         <div class="bw-text">
-          <p class="lead">
-              Signup for a <b>KickBacker</b> Link and Share with your network on Twitter, Facebook and elsewhere.
+          <p class="lead"><br>
+              <a href='javascript:focusInput()'>Sign up</a> for a <b>KickBacker</b> Link and share with your network on Twitter, Facebook and elsewhere. Receive the most clicks on your link and win the prize above. <a href='/{{project.id}}/leaderboard/' target='_blank'>See the '{{project.name}}' contest here.</a>
           </p>
         </div>
         <div class="bw-screen">
               <img class="thumb" src="/static/img/followers4.jpg" width='185px'>
         </div>
+      </div>
+      <div class="buzzword-elem">
+          <p class="lead">
+              Drive the most people to <b>{{ project.name }}</b> and Win.
+          </p>
+          <div id='project-{{project.id}}' class='index-project-leaderboard well' style='height:180px;background-color:white;' >
+              <a href="http://kickstarter.com/{{project.link}}">
+                <img src='{{project.img}}' width='215px' class='thumb'>
+              </a>
+              <h4> Winning KickBacker Receives:</h4>
+              <div style='padding-left:245px;padding-top:10px;'>
+                {{ project.backer_prize.desc| truncate(350) }}
+                {% if project.backer_prize.desc|length > 350 %}
+                  <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
+                {% endif %}
+              </div>
+          </div>
       </div>
     </div>
     {% else %}
@@ -64,7 +65,6 @@
       <div class="buzzword-elem">
         <div class="bw-text">
           <p class="lead">
-            <br>
              <b>Incentivize</b> your backers to spread the word about your project. <b>Reward</b> them for using their network to drive more backers to your project page.
           </p>
         </div>
@@ -73,13 +73,24 @@
         </div>
       </div>
       <div class="buzzword-elem">
-        <div class="bw-text">
-          <p class="lead">
-              Signup for <b>KickBacker</b>, share your personalized link with existing backers, and get closer to funding your project!
-          </p>
-        </div>
         <div class="bw-screen">
               <img class="thumb" src="/static/img/kickstarter-badge-backer.png" width='185px'>
+        </div>
+        <div class="bw-text">
+          <p class="lead">
+            <h3>How It Works</h3>
+            <ul style='text-size:14px;'>
+            <li><a href='javascript:focusInput();'>Sign up</a> and receive your KickBack link. Share it with your <a rel='popover' gref='#' id='kickback-share-pop' data-original-title='Sharing with your Backers' data-content="Your backers are already commited to your project. Put them to work to get it funded! Sharing is easy. Login to your KickStarter page and message them with your KickBacker link."> backers on KickStarter.</a></li>
+            <li><a rel='popover' id='kickback-desc-pop' href='#' data-original-title='What is a KickBack?' data-content="A KickBack is the same as a Kickstarter Reward. You can choose your $10 Reward, your $50 Reward or your $1000 Reward<br><br>Choosing a KickBack is easy. After sign up you will be asked to choose a KickBack from the same rewards offered on your project's Kickstarter page." >Select a KickBack</a> to give to the winning backer.</li>
+            <li>Backers compete by driving people to your project. We keep track on <a id='leaderboard-desc' rel="popover" href="#" data-original-title='What is a Leaderboard' data-content="A Leaderboard lists all of the KickBackers competing on your project for the KickBack. It keeps track of the KickBack, the contest end date as well as their clicks and their rewards. You can track all of your KickBacker progress from your leaderboard.">on the Leaderboard.</a></li>
+            <li>Seeing is a believing - <a target='_blank' href='{{sample_board}}'>go to a random project's Leaderboard.</a>
+            </li>
+            </ul>
+         <!--  
+            <li>< a target='_blank' href='{{sample_board}}'>See an existing Leaderboard</a>to see backers in action.</li>
+            Signup for <b>KickBacker</b>, share your personalized link with existing backers, and get closer to funding your project!
+          -->
+          </p>
         </div>
       </div>
     </div>

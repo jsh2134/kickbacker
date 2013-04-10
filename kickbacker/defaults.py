@@ -1,3 +1,5 @@
+import datetime
+
 BACKER = { 	'name': 'Unknown',
 			'image' : 'http://d297h9he240fqh.cloudfront.net/cache-a733f566c/images/users/missing_small.png',
 			'location' : '',
@@ -25,5 +27,38 @@ PROJECT = { 'author' : '',
 	
 }
 
+# Create fake backers for non existent
+FAKE_BACKERS = [
+					{ 'name': 'Jim Kerry',
+					  'backer_type' :'sample',
+					  'img' : '/static/img/sample-kb-1.jpg',
+					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=12),
+								'clicks' : '0',
+								'id' : '1',
+								'rewards' : ['twitter',
+											'facebook',],
+							 }
+					  },
+					{ 'name': 'Joan Sylvia',
+					  'backer_type' :'sample',
+					  'img' : '/static/img/sample-kb-2.jpg',
+					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=22),
+								'clicks' : '0',
+								'id' : '2',
+								'rewards' : ['youtube',
+											],
+							 }
+					  },
+					{ 'name': 'Matthew Morello',
+					  'backer_type' :'sample',
+					  'img' : '/static/img/sample-kb-3.jpg',
+					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=2),
+								'clicks' : '0',
+								'id' : '2',
+								'rewards' : [],
+							 }
+					  },
+							  
 
+]
 

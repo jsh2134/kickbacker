@@ -2,6 +2,7 @@
 import datetime
 import logging
 import urllib
+import random
 
 from flask import render_template
 from flask import request
@@ -14,6 +15,7 @@ from kickbacker import lib
 from kickbacker import datalib
 from kickbacker import rewards
 from kickbacker import kickstarter
+from kickbacker import defaults
 from kickbacker.celery_queue import tasks
 
 logging.basicConfig(filename='/var/log/kickbacker.log', level=logging.INFO)
@@ -35,8 +37,13 @@ def respond_index(project_id):
 		project['backer_prize'] = project_prize
 	else:
 		lead_type = 'owner'
+	
+	sample_projects = list(datalib.get_projects(app.rs))
+	sample_project_id = random.choice(sample_projects)
+	sample_board_link = '%s/leaderboard/' % sample_project_id
 	return render_template('index.html', project=project,
-										 lead_type=lead_type)
+										 lead_type=lead_type,
+										 sample_board=sample_board_link)
 
 def respond_contact():
 	return render_template('contact.html')
@@ -214,7 +221,7 @@ def create_new_project(backer_id, project_id, key, \
 	datalib.add_short_key(app.rs, key)
 	datalib.add_project_short_key(app.rs, project_id, key)
 	datalib.add_redirect(app.rs, key, url)
-	datalib.update_short_key(app.rs, key, 'clicks', 0)
+	datalib.update_short_key(app.rs, key, 'clicks', 1)
 	datalib.update_short_key(app.rs, key, 'url', url)
 	datalib.update_short_key(app.rs, key, 'created', \
 										datetime.datetime.now())
@@ -295,6 +302,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 
 		total_clicks = 0
+		max_clicks = 0
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
@@ -310,10 +318,22 @@ def leaderboard(project_id, share=False, backer_arg=None):
 
 						# Aggregate Clicks
 						total_clicks += int(backer_dict[backer_id]['key']['clicks'])
-						
+
+						if int(backer_dict[backer_id]['key']['clicks']) > max_clicks:
+							max_clicks =  int(backer_dict[backer_id]['key']['clicks'])
+
 						# Format Timestamp
 						backer_dict[backer_id]['key']['created'] = \
 											make_timestamp(backer_dict[backer_id]['key']['created'])
+
+		# Populate with Fake Backers if New Project
+		MAX_FAKES = 3
+		num_backers = len(backer_dict.keys())
+		if num_backers < MAX_FAKES:
+			for fake_backer in defaults.FAKE_BACKERS[0:MAX_FAKES-num_backers]:
+				fake_backer['key']['clicks'] = random.randint(0,max_clicks-1)
+				backer_dict[fake_backer['name']] = fake_backer
+				
 
 		sorted_backers = backer_dict.keys()
 		sorted_backers.sort(lambda x,y: cmp(
@@ -326,7 +346,6 @@ def leaderboard(project_id, share=False, backer_arg=None):
 
 		awesm_url = ''
 		kb_type = ''
-		logging.info('choos')
 		if backer_arg:
 			print backer_arg, project['kb_creator']
 			if project['kb_creator'] == backer_arg:

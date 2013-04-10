@@ -37,7 +37,7 @@ def respond_project_save(project_id):
 def respond_projects():
 	return views.show_projects()
 
-@app.route('/key/', methods=['POST'])
+@app.route('/key', methods=['POST'])
 def respond_add_key():
 	return views.new_short_key()
 

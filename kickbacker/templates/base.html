@@ -23,9 +23,11 @@
             <li style='margin:0px 20px;'>
               <h2><a href='/'>KickBacker</a></h2>
             </li>
+            {% if lead_type != 'backer' %}
             <li class="active">
               <a href='/'>How Does it Work?</a>
             </li>
+            {% endif %}
             <li>
               <a href='/projectboard'>Projects on KickBacker</a>
             </li>

@@ -58,10 +58,14 @@
 
 <div class="backers-container" style='margin:10px;'>
   {% for backer in sorted_backers %}
+      {% if backers[backer].backer_type == 'sample' %}
+    <div class='backer-wrap well' style='background-image:url(/static/img/sample.jpg);border:3px dotted #404040;'>
+      {% else %}
     <div class='backer-wrap well'>
-      <div id='backer-{{backer}}' class='backer'>
+      {% endif %}
+      <div id='backer-{{backer}}' class='backer' >
         <div class="backer-rank">
-          {{ loop.index }}.
+          {{ loop.index }}
         </div>
         <div class="backer-info">
           <img src='{{backers[backer].img}}' width='75' class="thumb">
