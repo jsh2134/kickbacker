@@ -240,11 +240,13 @@ def projectboard():
 	total_clicks = 0
 	for project_id in projects:
 
-		project_dict[project_id] = datalib.get_project(app.rs, project_id)
+		project_vals = datalib.get_project(app.rs, project_id)
 
 		# Ignore incomplete projects
-		if 'scraped' not in project_dict[project_id] or project_dict[project_id]['name'] == '':
+		if 'scraped' not in project_vals:
 			continue
+
+		project_dict[project_id] = project_vals
 
 		if 'clicks' in project_dict[project_id]:
 			total_clicks += int(project_dict[project_id]['clicks'])
