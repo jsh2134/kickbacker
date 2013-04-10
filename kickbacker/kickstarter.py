@@ -425,6 +425,17 @@ def add_prizes(prizes, project_id):
 	return True
 
 
+def is_valid_scrape(obj_dict, reqs):
+
+	# Valid Keys present
+	if set(reqs).intersect(set(obj_dict.keys())) == reqs:
+		# Keys not False or blank
+		for key in reqs:
+			if not obj_dict[key]:
+				return False
+		return True
+	return False
+
 def get_project(project_url):
 	logging.info("Parsing URL %s" % (project_url) )
 	project_id = get_project_id(project_url)
@@ -441,9 +452,9 @@ def get_project(project_url):
 	
 		logging.info('%s %s: %s' % ("Added" if a else "Existed", key, value))
 
-
 	# Finalize Scrape
-	datalib.update_project(app.rs, project_id, 'scraped', 1)
+	if is_valid_scrape(project_dict, ['name', 'title', 'link', 'prizes', 'img']):
+		datalib.update_project(app.rs, project_id, 'scraped', 1)
 
 	return project_dict
 
@@ -477,7 +488,10 @@ def get_backer(backer_url):
 		logging.info('%s %s: %s for %s' % ("Added" if a else "Existed", key, value, backer_id))
 	
 	# Finalize Scrape
-	datalib.update_backer(app.rs, backer_id, 'scraped', 1)
+	if is_valid_scrape(backer_dict, ['name', 'img']):
+		datalib.update_backer(app.rs, backer_id, 'scraped', 1)
+	else:
+		logging.info('NOT VALID!!!')
 
 	return backer_dict
 

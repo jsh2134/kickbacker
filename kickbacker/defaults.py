@@ -1,6 +1,6 @@
 import datetime
 
-BACKER = { 	'name': 'Unknown',
+BACKER = { 	'name': '',
 			'image' : 'http://d297h9he240fqh.cloudfront.net/cache-a733f566c/images/users/missing_small.png',
 			'location' : '',
 			'bio': '' ,

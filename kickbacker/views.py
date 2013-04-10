@@ -237,7 +237,12 @@ def projectboard():
 	projects = datalib.get_projects(app.rs)
 	total_clicks = 0
 	for project_id in projects:
+
 		project_dict[project_id] = datalib.get_project(app.rs, project_id)
+
+		# Ignore incomplete projects
+		#if 'scraped' not in project_dict[project_id]:
+		#	continue
 
 		if 'clicks' in project_dict[project_id]:
 			total_clicks += int(project_dict[project_id]['clicks'])
@@ -306,6 +311,11 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
+			
+			# Ignore incomplete backers
+			if 'scraped' not in backer_info:
+				continue
+
 			# Ignore Owners
 			if 'backer_type' in backer_info and backer_info['backer_type'] == 'backer':
 				backer_dict[backer_id] = backer_info
