@@ -309,7 +309,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 
 		total_clicks = 0
-		if len(project_backers) == 0:
+		if len(project_backers) <=1:
 			min_clicks = 10
 		else:
 			min_clicks = 1000000
