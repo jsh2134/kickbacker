@@ -1,5 +1,6 @@
 import os
 import secrets
+from kickbacker.email import ems
 
 # Here lie the settings
 
@@ -15,12 +16,12 @@ class Config(object):
 	CELERY_BROKER = 'redis://%s:%s/%s' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 	CELERY_BACKEND = 'redis://%s:%s/%s' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 	CELERY_INCLUDES = ['kickbacker.celery_queue.tasks']
-	SMTP_HOST = 'smtp.mandrillapp.com'
-	SMTP_PORT = '587'
-	SMTP_USER = 'jsh2134+kickbacker@gmail.com'
-	SMTP_PASS = secrets.MANDRILL_SMTP
-	ERROR_EMAIL_TO = 'jsh2134+kb@gmail.com'
-	ERROR_EMAIL_FROM = 'KickBacker Server <kickbacker@kickbacker.co>'
+	SMTP_HOST = ems.SMTP_HOST
+	SMTP_PORT = ems.SMTP_PORT 
+	SMTP_USER = ems.SMTP_USER 
+	SMTP_PASS = ems.SMTP_PASS
+	ERROR_EMAIL_TO = ems.ERROR_EMAIL_TO
+	ERROR_EMAIL_FROM = ems.ERROR_EMAIL_FROM
 
 
 class ProdConfig(Config):

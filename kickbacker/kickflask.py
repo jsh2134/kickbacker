@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from logging.handlers import SMTPHandler
+
+#from kickbacker.email import email_handler
 
 from flask import Flask
 import redis
@@ -25,18 +26,11 @@ class KickFlask(Flask):
 		file_handler.setFormatter(kb_formatter)
 		self.logger.addHandler(file_handler)
 
-		# Email Log
-		credentials = [ self.config['SMTP_USER'], self.config['SMTP_PASS'] ]
-		host_info = ( self.config['SMTP_HOST'], self.config['SMTP_PORT'] )
-		#host_info = self.config['SMTP_HOST']
-		mail_handler = SMTPHandler(host_info, \
-                                self.config['ERROR_EMAIL_FROM'], \
-                                [self.config['ERROR_EMAIL_TO']], \
-								'Kickbacker Server Failure',\
-								credentials = credentials )
-		mail_handler.setLevel(logging.ERROR)
-		mail_handler.setFormatter(kb_formatter)
-		self.logger.addHandler(mail_handler)
+		# Email handler
+		#mail_handler = email_handler.KickHandler()
+		#mail_handler.setLevel(logging.ERROR)
+		#mail_handler.setFormatter(kb_formatter)
+		#self.logger.addHandler(mail_handler)
 
 
 	def connect_redis(self):

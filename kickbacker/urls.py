@@ -71,10 +71,8 @@ def respond_contact():
 def force_error():
 	logging.error('Some Error')
 	print 'errors'
-	try:
-		print jeff
-	except:
-		logging.exception('Some Error')
+	
+	logging.error('blah!')
 	return views.respond_contact()
 
 @app.route('/error2/')
