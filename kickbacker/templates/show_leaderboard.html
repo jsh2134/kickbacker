@@ -21,16 +21,16 @@
 <div id='project-{{project.id}}' class='project-leaderboard'>
     <div class='project-leaderboard-container well' >
       <div class='project-leaderboard-desc'>
-        <a target="_blank" href="http://kickstarter.com/{{project.link}}">
+        <a target="_blank" href="{{project.link}}">
           <img src='{{project.img}}' width='150px' class='thumb'>
         </a>
         <h1>Kickbacker Leaderboard</h1>
          <div class="caption">
-          <a target="_blank" href="http://kickstarter.com/{{project.link}}">
+          <a target="_blank" href="{{project.link}}">
             <span class='project-title'>{{ project.name }}</span>
           </a>
           <p>
-            <span class='project-author'>by <a target="_blank" href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
+            <span class='project-author'>by <a target="_blank" href="{{project.author_link}}">{{project.author}}</a></span>
             <br><br>
             <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
             &nbsp;&nbsp;

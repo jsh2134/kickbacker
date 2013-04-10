@@ -20,7 +20,7 @@ class Config(object):
 	SMTP_USER = 'jsh2134+kickbacker@gmail.com'
 	SMTP_PASS = secrets.MANDRILL_SMTP
 	ERROR_EMAIL_TO = 'jsh2134+kb@gmail.com'
-	ERROR_EMAIL_FROM = 'John Doe <kickbacker@kickbacker.co>'
+	ERROR_EMAIL_FROM = 'KickBacker Server <kickbacker@kickbacker.co>'
 
 
 class ProdConfig(Config):

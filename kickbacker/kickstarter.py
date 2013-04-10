@@ -428,7 +428,7 @@ def add_prizes(prizes, project_id):
 def is_valid_scrape(obj_dict, reqs):
 
 	# Valid Keys present
-	if set(reqs).intersect(set(obj_dict.keys())) == reqs:
+	if set(reqs).intersection(set(obj_dict.keys())) == reqs:
 		# Keys not False or blank
 		for key in reqs:
 			if not obj_dict[key]:
