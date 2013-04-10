@@ -302,7 +302,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 
 		total_clicks = 0
-		max_clicks = 0
+		min_clicks = 1000000
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
@@ -319,8 +319,8 @@ def leaderboard(project_id, share=False, backer_arg=None):
 						# Aggregate Clicks
 						total_clicks += int(backer_dict[backer_id]['key']['clicks'])
 
-						if int(backer_dict[backer_id]['key']['clicks']) > max_clicks:
-							max_clicks =  int(backer_dict[backer_id]['key']['clicks'])
+						if int(backer_dict[backer_id]['key']['clicks']) < min_clicks:
+							min_clicks =  int(backer_dict[backer_id]['key']['clicks'])
 
 						# Format Timestamp
 						backer_dict[backer_id]['key']['created'] = \
@@ -331,7 +331,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		num_backers = len(backer_dict.keys())
 		if num_backers < MAX_FAKES:
 			for fake_backer in defaults.FAKE_BACKERS[0:MAX_FAKES-num_backers]:
-				fake_backer['key']['clicks'] = random.randint(0,max_clicks-1)
+				fake_backer['key']['clicks'] = random.randint(0,min_clicks-1)
 				backer_dict[fake_backer['name']] = fake_backer
 				
 

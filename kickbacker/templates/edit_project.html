@@ -26,7 +26,6 @@
         else {
             $.ajax({ 'type': 'POST',
                    'async': false, 
-                   //'success': function () { window.location = '/'+project_id+'/leaderboard/share?kb_type=owner'},
                    'success': function () { window.location = '/'+project_id+'/leaderboard/'+backer_id+'/share'},
                    'cache': false,
                    'datatype': 'json',
@@ -51,6 +50,17 @@
   <input type='hidden' value="{{project.kb_creator}}" id="backer_id">
 
   <div class="row">
+  <div class='span4'>
+    <div class='well'>
+      <h3>Selecting your KickBack</h3>
+        Look Familiar? These KickBacks are the same as the Rewards on your KickStarter page. Choose one of these to be the <b>KickBack</b> that your backers will compete for. 
+<br><br>At the end of the KickStarter campaign, we will put you two in touch to exchange the KickBack.
+<br><br> You can choose which ever KickBack you want, but remember to choose the one people will work the hardest to compete for.
+
+
+    </div>
+  {% include 'help_project.html' %}
+  </div>
     <div class="span7 well">
 
      <div id='loading-div' style='align:center;margin:20px;'> 
@@ -79,5 +89,4 @@
     <button id='reward-select' style='float:right;display:none;' onclick='save_kickback()' class="btn btn-primary">Select Kickback</button>
   </div>
  </div>
-  {% include 'help_project.html' %}
 {% endblock content %}
