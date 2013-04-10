@@ -77,3 +77,9 @@ def force_error():
 		logging.exception('Some Error')
 	return views.respond_contact()
 
+@app.route('/error2/')
+def force_error2():
+	from kickbacker.email import email_test
+	email_test.test()
+	return views.respond_contact()
+
