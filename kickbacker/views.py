@@ -243,7 +243,7 @@ def projectboard():
 		project_dict[project_id] = datalib.get_project(app.rs, project_id)
 
 		# Ignore incomplete projects
-		if 'scraped' not in project_dict[project_id]:
+		if 'scraped' not in project_dict[project_id] or project_dict[project_id]['name'] == '':
 			continue
 
 		if 'clicks' in project_dict[project_id]:
