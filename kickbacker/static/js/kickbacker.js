@@ -135,9 +135,9 @@ function create_project() {
                 // create project
                 save_key(data.path, backer_id, project_id, url, kb_url, email, kb_type, awesm_url);
               }, function(data) {
-                  console.log(data);
                   $('#your-link').html("An Error has occurred when shortening your url: " + data.responseText);
                   });
+
   if (kb_type == 'backer') {
      window.location = "/"+project_id+"/leaderboard/"+backer_id+"/share";
   }

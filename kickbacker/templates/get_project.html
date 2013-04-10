@@ -14,10 +14,10 @@ $(function () {
   $('#ks-url').keyup(function() {
     url = $('#ks-url').val();
     if (is_valid_kickstarter_url(url, 'project') == false) {
-       $('#ks-url').addClass('error');
+       $('#ks-url').parent().parent().addClass('error');
        $('#go').attr('disabled', 'disabled');
     } else {
-       $('#ks-url').removeClass('error');
+       $('#ks-url').parent().parent().removeClass('error');
         if (is_valid_submit() == true) {
           $('#go').removeAttr('disabled');
         }
@@ -26,10 +26,10 @@ $(function () {
   $('#ks-profile').keyup(function() {
     url = $('#ks-profile').val();
     if (is_valid_kickstarter_url(url, 'backer') == false) {
-       $('#ks-profile').addClass('error');
+       $('#ks-profile').parent().parent().addClass('error');
        $('#go').attr('disabled', 'disabled');
     } else {
-       $('#ks-profile').removeClass('error');
+       $('#ks-profile').parent().parent().removeClass('error');
         if (is_valid_submit() == true) {
           $('#go').removeAttr('disabled');
         }
@@ -37,10 +37,10 @@ $(function () {
   });
   $('#ks-email').keyup(function() {
     if (is_valid_email() == false) {
-       $('#ks-email').addClass('error');
+       $('#ks-email').parent().parent().addClass('error');
        $('#go').attr('disabled', 'disabled');
     } else {
-       $('#ks-email').removeClass('error');
+       $('#ks-email').parent().parent().removeClass('error');
         if (is_valid_submit() == true) {
           $('#go').removeAttr('disabled');
         }
@@ -115,7 +115,7 @@ $(function () {
         </div>
       </div>
       <div id="button-div">
-        <button onclick='create_project()' class="btn btn-primary" type="button" style='float:right;'>
+        <button id='go' onclick='create_project()' class="btn btn-primary" type="button" style='float:right;'>
           {% if lead_type == 'backer' %}
             Start Earning Kickbacks!
           {% else %}
