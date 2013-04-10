@@ -38,7 +38,10 @@
       {% else %}
         $('#your-link-area').val('I backed this project on Kickstarter and you should too! ' + awesm_url);
       {% endif %}
+        $('#your-link-txt').html(awesm_url);
+        $('#your-link-txt').attr('href', awesm_url);
       $('#myModal').modal('show');
+      $('#your-link-area').focus();
     });
 
 
@@ -57,29 +60,41 @@
     {% if kb_type == 'owner' %}
       <h3 id="myModalLabel">Share this with your Backers on KickStarter!</h3>
     {% else %}
-      <h3 id="myModalLabel">Share this link with your Networks!</h3>
+      <h3 id="myModalLabel">Congratulations, you are Ready to Win!</h3>
     {% endif %}
   </div>
   <div class="modal-body">
+    {% if kb_type == 'owner' %}
+     <p style='font-size:16px;' class='well'>
+        <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='150px' class='thumb'></a>
+      Here is your KickBacker link: <a href='#' target='_blank' id='your-link-txt'></a>
+      <br><br>
+       Copy the message below and share with your backers <a href='http://kickstarter.com/' target='_blank'>on Kickstarter.</a> They will be prompted to create and share their own KickBacker link with their networks.
+    </p>
+    {% else %}
+     <p style='font-size:16px;' class='well'>
+        <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='150px' class='thumb'></a>
+      Here is your unique KickBacker link: <a href='#' target='_blank' id='your-link-txt'></a></b> 
+    <br><br>
+    It tracks all referrals that came through you and adds to your clicks. Share your link using the buttons below and track your progress on the Leaderboard.
+    <br>
+    </p>
+      <b>Step 1:</b> Edit and Copy this Message<br>
+    {% endif %}
+
     <div id='your-link' align="center">
-      Copy and Paste this Message:<br>
       <textarea id='your-link-area' class='input-xlarge'> </textarea>
     </div>
 
     {% if kb_type == 'backer' %}
+      <b>Step 2:</b> Share on your Networks<br>
       <div class='shareaholic-canvas' data-shareaholic-widgets='share_buttons'></div>
+    {% else %}
+      <div align='center'>
+       Edit and Share with your backers <a href='http://kickstarter.com/' target='_blank'>on Kickstarter.</a> 
+      </div>
     {% endif %}
 
-    <div id='project-{{project.id}}' class='index-project-leaderboard'>
-        <p>
-        <a href="http://kickstarter.com/{{project.link}}"><img src='{{project.img}}' width='100px' class='thumb'></a>
-        <h3>Supporting</h3>
-        <a href="http://kickstarter.com/{{project.link}}"><span class='index-project-title'>{{ project.name }}</span></a>
-          <br>
-          <span class='index-project-author'>by <a href="http://kickstarter.com/{{project.author_link}}">{{project.author}}</a></span>
-          <br><br>
-        </p>
-    </div>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
