@@ -309,14 +309,18 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		project_keys = datalib.get_project_short_keys(app.rs, project_id)
 
 		total_clicks = 0
-		min_clicks = 1000000
+		if len(project_backers) == 0:
+			min_clicks = 10
+		else:
+			min_clicks = 1000000
+
 		backer_dict = {}
 		for backer_id in project_backers:
 			backer_info = datalib.get_backer(app.rs, backer_id)
 			
 			# Ignore incomplete backers
-			if 'scraped' not in backer_info:
-				continue
+			#if 'scraped' not in backer_info:
+			#	continue
 
 			# Ignore Owners
 			if 'backer_type' in backer_info and backer_info['backer_type'] == 'backer':
