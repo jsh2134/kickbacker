@@ -312,7 +312,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 
 		total_clicks = 0
 		if len(project_backers) <=1:
-			min_clicks = 10
+			min_clicks = 50
 		else:
 			min_clicks = 1000000
 
@@ -350,7 +350,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		num_backers = len(backer_dict.keys())
 		if num_backers < MAX_FAKES:
 			for fake_backer in defaults.FAKE_BACKERS[0:MAX_FAKES-num_backers]:
-				fake_backer['key']['clicks'] = random.randint(0,min_clicks-1)
+				fake_backer['key']['clicks'] = random.randint(1,min_clicks-1)
 				backer_dict[fake_backer['name']] = fake_backer
 				has_fakes = True
 				

@@ -44,7 +44,7 @@
       </div>
       <div class="buzzword-elem">
           <p class="lead">
-              Drive the most people to <b>{{ project.name }}</b> and Win.
+              Send the most people to <b>{{ project.name }}</b> and win.
           </p>
           <div id='project-{{project.id}}' class='index-project-leaderboard well' style='height:180px;background-color:white;' >
               <a href="http://kickstarter.com/{{project.link}}">
@@ -56,6 +56,8 @@
                 {% if project.backer_prize.desc|length > 350 %}
                   <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
                 {% endif %}
+                <br>
+                <a href='/{{project.id}}/leaderboard/' target='_blank'>See the '{{project.name}}' contest here.</a>
               </div>
           </div>
       </div>
