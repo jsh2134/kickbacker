@@ -34,7 +34,7 @@
             <br><br>
             <span class='project-clicks'>{{ total_clicks }} Total Clicks</span>
             &nbsp;&nbsp;
-            <span class='project-clicks'>{{ backers|length }} Kickbackers</span>
+            <span class='project-clicks'>{{ backers|length - has_fakes }} Kickbackers</span>
           </p>
         </div>
       </div>
@@ -57,7 +57,7 @@
 </div>
 
 <div class="backers-container" style='margin:10px;'>
-  {% if has_fakes %}
+  {% if has_fakes > 0 %}
     <div class='backer-wrap well'>
       <h3>There needs to be at least three KickBackers to win the prize. If you are already a KickBacker share your KickBacker link with your friends. If not, Sign up and <a target='_blank' href='/new/{{project.id}}'>become a KickBacker for this Project.</a></h3>
     </div> 

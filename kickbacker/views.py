@@ -346,7 +346,7 @@ def leaderboard(project_id, share=False, backer_arg=None):
 
 		# Populate with Fake Backers if New Project
 		MAX_FAKES = 3
-		has_fakes = False
+		has_fakes = 0
 		num_backers = len(backer_dict.keys())
 		if num_backers < MAX_FAKES:
 			fake_sample = random.sample(defaults.FAKE_BACKERS, MAX_FAKES-num_backers)
@@ -354,9 +354,9 @@ def leaderboard(project_id, share=False, backer_arg=None):
 				try:
 					fake_backer['key']['clicks'] = random.randint(1,min_clicks-1)
 				except:
-					fake_backer['key']['clicks'] = 0
+					fake_backer['key']['clicks'] = 1
 				backer_dict[fake_backer['name']] = fake_backer
-				has_fakes = True
+				has_fakes += 1
 				
 
 		sorted_backers = backer_dict.keys()
