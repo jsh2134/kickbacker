@@ -349,7 +349,8 @@ def leaderboard(project_id, share=False, backer_arg=None):
 		has_fakes = False
 		num_backers = len(backer_dict.keys())
 		if num_backers < MAX_FAKES:
-			for fake_backer in defaults.FAKE_BACKERS[0:MAX_FAKES-num_backers]:
+			fake_sample = random.sample(defaults.FAKE_BACKERS, MAX_FAKES-num_backers)
+			for fake_backer in fake_sample:
 				fake_backer['key']['clicks'] = random.randint(1,min_clicks-1)
 				backer_dict[fake_backer['name']] = fake_backer
 				has_fakes = True
