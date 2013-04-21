@@ -29,7 +29,7 @@ PROJECT = { 'author' : '',
 
 # Create fake backers for non existent
 FAKE_BACKERS = [
-					{ 'name': 'Jim Kerry',
+					{ 'name': 'Jim Clunrey',
 					  'backer_type' :'sample',
 					  'img' : '/static/img/sample-kb-1.jpg',
 					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=12),
@@ -56,6 +56,24 @@ FAKE_BACKERS = [
 								'clicks' : '0',
 								'id' : '2',
 								'rewards' : [],
+							 }
+					  },
+					{ 'name': 'Lucia Mariana',
+					  'backer_type' :'sample',
+					  'img' : '/static/img/sample-kb-4.jpg',
+					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=2),
+								'clicks' : '0',
+								'id' : '2',
+								'rewards' : [],
+							 }
+					  },
+					{ 'name': 'Tuan Shinto',
+					  'backer_type' :'sample',
+					  'img' : '/static/img/sample-kb-5.jpg',
+					  'key' : {  'created' : datetime.datetime.now() - datetime.timedelta(days=2),
+								'clicks' : '0',
+								'id' : '2',
+								'rewards' : ['twitter'],
 							 }
 					  },
 							  
