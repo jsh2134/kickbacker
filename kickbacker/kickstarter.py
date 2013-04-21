@@ -295,7 +295,7 @@ def parse_project_page(project_id, soup):
 			desc_str = ""
 			for s in desc_div[0].contents:
 				desc_str += s.string.strip()
-			prize['desc'] = desc_str.strip()
+			prize['desc'] = unescape_html(desc_str.strip())
 		except:
 			logging.exception('Cant find descrip for this prize')
 

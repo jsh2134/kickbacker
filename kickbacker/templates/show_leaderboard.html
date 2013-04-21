@@ -41,9 +41,9 @@
       <div class='project-leaderboard-kickback' style='float:right;'>
         <div>
           <h3> Your KickBack</h3>
-          <p class='prize-text'>{{ project.backer_prize.desc| truncate(200) }}
+          <p class='prize-text'>{{ project.backer_prize.desc| truncate(200)|safe }}
           {% if project.backer_prize.desc|length > 199 %}
-          <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
+          <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc|safe}}'>Full Description</a>
           {% endif %}
           <br>
           <b>(A ${{project.backer_prize.value}} value)</b>

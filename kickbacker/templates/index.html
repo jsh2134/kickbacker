@@ -52,9 +52,9 @@
               </a>
               <h4> Winning KickBacker Receives:</h4>
               <div style='padding-left:245px;padding-top:10px;'>
-                {{ project.backer_prize.desc| truncate(350) }}
+                {{ project.backer_prize.desc| truncate(350)|safe }}
                 {% if project.backer_prize.desc|length > 350 %}
-                  <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc}}'>Full Description</a>
+                  <a rel='popover' id='prize-desc-pop' href='#' data-original-title='{{project.backer_prize.title}}' data-content='{{project.backer_prize.desc|safe}}'>Full Description</a>
                 {% endif %}
                 <br>
                 <a href='/{{project.id}}/leaderboard/' target='_blank'>See the '{{project.name}}' contest here.</a>
