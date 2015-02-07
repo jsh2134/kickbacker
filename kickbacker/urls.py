@@ -81,3 +81,8 @@ def force_error2():
 	email_test.test()
 	return views.respond_contact()
 
+@app.route('/blah/')
+def countdown():
+	from flask import render_template
+	return render_template('test.html')
+

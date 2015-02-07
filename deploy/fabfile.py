@@ -10,6 +10,7 @@ from deploy.amazon_settings import MAIN_IP, aws_defaults
 
 USER_HOME = '/home/jhull/'
 REMOTE_DIR = '/home/kickbacker/kb/'
+USER = 'kickbacker'
 HOME_DIR = app.config['HOME']
 TMP_PATH = '/tmp/'
 S3CFG_FILE = '.s3cfg'
@@ -85,7 +86,7 @@ def deploy_web():
 def install_web():
 
 	# Create User
-	user = 'kickbacker'
+	user = USER
 	remote_home_dir = '/home/' + user 
 	
 	with settings(warn_only=True):
@@ -160,13 +161,25 @@ def start_app():
 	sudo('service nginx start')
 
 	# start supervisor
-	virtualenv('supervisord')
+	start_supervisord()
 
 def restart_supervisord():
 	sudo('service supervisord restart')
 
+def start_supervisord():
+	virtualenv('supervisord -c %s/etc/supervisord.conf' % env.directory)
+
+def kill_supervisord():
+	sudo("""ps -ef | grep supervisord | awk '{print $2}' | xargs kill""")
+
 def restart_app():
 	virtualenv('supervisorctl restart celery kickbacker')
+
+def super_start_app():
+	virtualenv('supervisorctl start celery kickbacker')
+
+def restart_kickbacker():
+	virtualenv('supervisorctl restart kickbacker')
 
 
 def update_code():

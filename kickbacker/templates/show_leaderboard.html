@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 
 {% block header %}
+    <link rel="stylesheet" href="/static/css/jquery.countdown.css" />
+
+
 
     <script type='text/javascript' src='/static/js/bootstrap-tooltip.js'></script>
     <script type='text/javascript' src='/static/js/bootstrap-popover.js'></script>
+    <script type='text/javascript' src='/static/js/jquery.countdown.min.js'></script>
 
     <script type='text/javascript'>
       $(function () {
           $('#prize-desc-pop').popover({'placement':'bottom'});
+        var newYear = new Date(); 
+        newYear = new Date(newYear.getFullYear() + 1, 1 - 1, 1); 
+        console.log(newYear);
+        $('#defaultCountdown').countdown( {until: newYear} );
+        console.log($('#defaultCountdown'));
       });
     </script>
 
@@ -49,9 +58,7 @@
           <b>(A ${{project.backer_prize.value}} value)</b>
           </p>
           <a target='_blank' href='/new/{{project.id}}'>Become a KickBacker for this Project</a>
-       <!-- TODO 
-         <span style="font-size:24px;color:green">24d 12h 22m Remaining</span>
-        -->
+         <div class='hasCountdown' id='defaultCountdown' style="font-size:24px;color:green">&nbsp;</div>
         </div>
       </div>
 </div>
